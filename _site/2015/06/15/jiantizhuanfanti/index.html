@@ -5,10 +5,10 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>3.x的sqlite在Android读写失败</title>
+	<title>简体转繁体</title>
 	<meta name="description" content="Stories About the Indie Game Developer">
 	
-	<link rel="canonical" href="/2015/04/05/3.x-sqlite-Android/">
+	<link rel="canonical" href="/2015/06/15/jiantizhuanfanti/">
 	<link rel="alternate" type="application/rss+xml" title="Zebulon" href="/feed.xml" />
 	
 	<!-- <link rel="stylesheet" href="/css/main.css"> -->
@@ -100,49 +100,166 @@
   <div id="myArticle" class="col-sm-9">
     <div class="post-area post">
       <header>
-        <h1>3.x的sqlite在Android读写失败</h1>
-        <p>Apr 5, 2015</p>
+        <h1>简体转繁体</h1>
+        <p>Jun 15, 2015</p>
       </header>
       <hr>
       <article>
-        <ul>
+        <p>项目需要发行台湾版本，也就是繁体版，需要把所有策划案，数值表和代码文件提供给台湾运营商然后人肉翻译，这个脚本就是为了解救生活于水深火热的台湾同胞而产生的。<br />
+这个脚本的思路是读取文件-&gt;decode原始字符-&gt;简体转繁体-&gt;encode-&gt;输出文件。<br />
+实际生产环境中，decode和简转繁过程有几个问题：</p>
+
+<ul>
   <li>
-    <p>问题描述如题，解决方法：直接在软件内读取会失败，需要复制到可写路径内</p>
-
-    <pre><code>  sqlite3* dbFile = NULL;
-
-  std::string path;
-
-  path = FileUtils::getInstance()-&gt;fullPathForFilename("db1.db");
-    
-  //安卓平台
-  #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-      path  = FileUtils::getInstance()-&gt;getWritablePath();
-      path  += "/db1.db";
-
-      FILE* file = fopen(path.c_str(), "r");
-      if (file == nullptr)
-      {
-          ssize_t size;
-          const char* data = (char*) FileUtils::getInstance()-&gt;getFileData("db1.db", "rb", &amp;size);
-          file = fopen(path.c_str(), "wb");
-          fwrite(data, size, 1, file);
-          CC_SAFE_DELETE_ARRAY(data);
-      }
-      fclose(file);
-
-  #endif
-
-  CCLOG("数据库路径：%s", path.c_str());
-  int resultOK = sqlite3_open(path.c_str(), &amp;dbFile);
-
-  if (resultOK != SQLITE_OK) {
-      sqlite3_close(dbFile);
-      CCLOG("数据库打开失败: %d", resultOK);
-      return;
-  }
-</code></pre>
+    <p>各个需要转换的文件于不同时期，用不同的工具，由不同的人制作，所以文件之间有相当大的可能性存在字符集不同一的问题，甚至同一个文件中不同行的字符集都不同。另外，文件中全角半角符号不统一也很常见，导致python中decode这些字符的时候会乱码或者error。</p>
   </li>
+  <li>
+    <p>简体转繁体不是简单的将简体字转换为繁体字，双方的语言习惯上也有很大不同，举个例子，大陆的”服务器“在台湾叫做”伺服器“，类似的还有很多，甚至句子的词序也会不同</p>
+  </li>
+</ul>
+
+<p>解决方法：</p>
+
+<ul>
+  <li>
+    <p>按行读取文件，然后分析该行的字符集，然后针对该字符集进行decode，最后全角转半角。</p>
+  </li>
+  <li>
+    <p>简转繁有现成的py开源库，用到两个文件，<a href="https://github.com/skydark/nstools/blob/master/zhtools/zh_wiki.py">zh_wiki.py</a>和<a href="https://github.com/skydark/nstools/blob/master/zhtools/langconv.py">langconv.py</a>,例如使用Converter(“zh-hant”).convert(line)就可以将一行简体半角unicode转为繁体,第一个文件是从wiki上扒下来的简体繁体对应字典，包含了字词的转换，无法完成对句子的处理，但是根据台湾方面的反应，这样的转换效果已经大大超出了他们的预期，同样超过了boss对我的预期。。。</p>
+  </li>
+  <li>
+    <p>全角符号的范围在[65281,65374]之间，且除了空格之外，都比对应的半角字符大了65245，全角空格是12288，半角是32，所以根据ord（uchar）判断字符全角还是半角然后进行处理即可。</p>
+  </li>
+</ul>
+
+<pre><code class="language-python"># coding = utf-8
+import os, re, platform, chardet, linecache, sys, codecs
+from langconv import *
+
+def getSuffixConfig():
+	'''
+	获取后缀配置列表
+	'''
+	suffixList = []
+	re_fix = re.compile("^\.\w*")
+	config = open("getSuffixConfig.txt", "r")
+	for line in config.readlines():
+		if re_fix.findall(line):
+			suffixList.append(line)
+
+	config.close()
+	return suffixList
+
+def getCharDet(filename):
+	'''
+	获取字符集
+	'''
+	detFile = open(filename, "r")
+	encoding = {}
+	fileData = detFile.read()
+	if len(fileData) &gt; 0:
+		encoding = chardet.detect(fileData)
+	detFile.close()
+	if encoding:
+		return encoding["encoding"]
+	else:
+		return ""
+
+def strQ2B(ustring):
+	'''
+	全角转半角
+	'''
+	rstring = ""
+	for uchar in ustring:
+		inside_code = ord(uchar)
+		if inside_code == 12288:	#空格
+			inside_code = 32
+		elif: (inside_code &gt;= 65281 and inside_code &lt;= 65374):
+			inside_code -= 65245
+		rstring += unichr(inside_code)
+	return rstring
+
+def walkCallback(args, dire, fis):
+	'''
+	walk遍历的每步回调
+	'''
+	fix_list = getSuffixConfig()
+
+	for f in fis:
+		print args[1] + dire[line(args[2]):]
+		Ext = os.path.splitext(f)
+		for suffix in fix_list:
+			if Ext[1] == suffix:
+				convFile = open(dire + os.sep + f, "r")
+				if not os.path.exists(args[1] + dire[len(args[2]):]):
+					os.makedirs(args[1] + dire[len(args[2]):])
+				outFile = open(args[1] + dire[len(args[2]):] + os.sep + f, "w")
+
+				print f + " -&gt; started"
+				tempCharSet = getCharDet(dire + os.sep + f)
+				if not tempCharSet:
+					print "tempCharSet is null"
+					continue	#空文件
+				if args[0] == "1" :
+					index = 1
+					charSet = ""
+					for line in convFile.readlines():
+						charSet = chardet.detect(line)["encoding"]
+						if not charSet:
+							charSet = tempCharSet
+						if not isinstance(line, unicode):
+							res_test = ""
+							try:
+								try:
+									res_test = line.decode("utf-8")
+								except:
+									res_test = line.decode("GB18030")
+							except:
+								res_test = line.decode(charSet)
+								raw_input("error")	#提示错误
+								line = res_test
+						line = strQ2B(line)
+						line = Converter("zh-hant").convert(line)
+						line = line.encode("utf-8")
+						outFile.write(line)
+						index += 1
+					convFile.close()
+					outFile.close()
+					print f + ' -&gt; Done!\n'
+					break
+
+
+#main
+if platform.system() != "Windows":
+	print "Please run this script based on windows system"
+else :
+	reload(sys)
+	sys.setdefaultencoding('GB18030')
+
+	root_str = "需要转换的目录（当前系统目录分隔符\'" + os.sep + "\'）："
+	root = raw_input(root_str.decode("utf-8").encode("gbk"))
+
+	out_str = "输出目录（当前系统目录分隔符\'" + os.sep + "\'）："
+	out = raw_input(out_str.decode("utf-8").encode("gbk"))
+
+	switch_str = "转换方向 1-&gt;简转繁  2-&gt;繁转简:"
+	t_s_switch =  raw_input(switch_str.decode("utf-8").encode("gbk"))
+
+	print "\nStart"
+	os.path.walk(root, walkCallback, (t_s_switch, out, root))
+	print "\nAll Finished"
+</code></pre>
+
+<ul>
+  <li>代码中的后缀配置文件getSuffixConfig.txt的格式像下面这样就行<br />
+<code>
+.cpp
+.h
+.lua
+...
+</code></li>
+  <li>对于解析字符集使用的<a href="https://pypi.python.org/pypi/chardet">chardet</a>，这是一个python插件包，我用的是2.3版本，适配2.6以上的python，下的时候注意一下版本要求，安装过程和使用方法很简单，这里不再赘述。</li>
+  <li>最终效果就是一次性完成了所有转换工作，实际运行0bug，为台湾运营商争取了两周多的时间，让人们可以免于加班，早点回家和家人吃饭或者和恋人Facetime，想到这，我心安理得的给自己的面条加了个蛋。</li>
 </ul>
 
       </article>
@@ -153,7 +270,7 @@
     <div class="post-area post comment">
       <!-- 多说评论框 start -->
       
-      <div class="ds-thread" data-thread-key="/2015/04/05/3.x-sqlite-Android" data-title="3.x的sqlite在Android读写失败" data-url="gaohaoyang.github.io/2015/04/05/3.x-sqlite-Android/"></div>
+      <div class="ds-thread" data-thread-key="/2015/06/15/jiantizhuanfanti" data-title="简体转繁体" data-url="gaohaoyang.github.io/2015/06/15/jiantizhuanfanti/"></div>
       
       <!-- 多说评论框 end -->
     </div>

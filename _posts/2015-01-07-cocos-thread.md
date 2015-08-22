@@ -1,9 +1,9 @@
 ---
-Title: cocos2d-x 3.0 线程安全
-date: 2015-01-07 11:08
-status: public
-tag: cocos2d-x
+layout: post
 title: 'cocos2d-x 3.0 线程安全'
+date: 2015-01-07 11:08
+categories: Cocos
+excerpt:
 ---
 
 在cocos2dx中使用多线程，难免要考虑线程安全的问题。cocos2dx 3.0中新加入了一个专门处理线程安全的函数`performFunctionInCocosThread()`。他是Scheduler类的一个成员函数：

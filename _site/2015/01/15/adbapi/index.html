@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Twisted adb模块 api</title>
+	<meta name="description" content="Stories About the Indie Game Developer">
+	
+	<link rel="canonical" href="/2015/01/15/adbapi/">
+	<link rel="alternate" type="application/rss+xml" title="Zebulon" href="/feed.xml" />
+	
+	<!-- <link rel="stylesheet" href="/css/main.css"> -->
+
+	<link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
+	<!-- <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/fontawesome/4.2.0/css/font-awesome.min.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"> -->
+	
+
+	<link rel="stylesheet" type="text/css" href="/static/css/index.css">
+	
+	<!-- <script type="text/javascript" src="/static/js/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script> -->
+
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" src="/static/js/index.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/highlight.js/8.4/styles/monokai_sublime.min.css">
+	<!-- <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/highlight.js/8.4/styles/railscasts.min.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/highlight.js/8.4/styles/monokai.min.css"> -->
+	<!-- <script type="text/javascript" src="http://apps.bdimg.com/libs/highlight.js/8.4/languages/dos.min.js"></script> -->
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/highlight.js/8.4/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?b636473d6ffa17615f94e5db1459ea81";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+</head>
+
+ <!--  <body data-spy="scroll" data-target="#myAffix"> -->
+  <body>
+
+    <header>
+
+<!-- navbar -->
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <!-- <span class="icon-bar"></span> -->
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Zebulon</a>
+      <p class="navbar-text">记录一只喜欢游戏但是玩不好游戏的游戏开发者的练级之路</p>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+
+        
+          <li>
+        
+          <a href="/"><span class="glyphicon glyphicon-th-large"></span> Blog</a></li>
+
+        
+          
+            
+              <li>
+            
+            <a href="/about/"><span class="glyphicon glyphicon-heart"></span> About</a></li>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+</header>
+
+
+    <div id="main" class="container main">
+      <div class="row">
+  <div id="myArticle" class="col-sm-9">
+    <div class="post-area post">
+      <header>
+        <h1>Twisted adb模块 api</h1>
+        <p>Jan 15, 2015</p>
+      </header>
+      <hr>
+      <article>
+        <p>#1. Scheduling tasks for the future<br />
+&gt; 要在未来X秒的时候运行一个任务，这种方式定义在reactor接口里面<br />
+``` python<br />
+twisted.internet.interfaces.IReactorTime:</p>
+
+<p>from twisted.internet import reactor<br />
+def f(s):<br />
+    print “this will run 3.5 seconds after it was scheduled: %s” % s<br />
+reactor.callLater(3.5, f, “hello, world”)<br />
+# f() will only be called if the event loop is started.<br />
+reactor.run()<br />
+<code>
+&gt; 如果函数结果很重要或者有必要处理函数抛出的异常，那么twisted.internet.task.deferLater功能可以很方便的创建一个Deferred并设置一个延迟调用： 
+</code> python<br />
+from twisted.internet import task<br />
+from twisted.internet import reactor<br />
+def f(s):<br />
+  return “This will run 3.5 seconds after it was scheduled: %s” % s<br />
+d = task.deferLater(reactor, 3.5, f, “hello, world”)<br />
+def called(result):<br />
+  print result<br />
+d.addCallback(called)<br />
+# f() will only be called if the event loop is started.<br />
+reactor.run()<br />
+<code>
+&gt; 如果我们要让一个任务在未来每X秒运行一次，我们可以用twisted.internet.task.LoopingCall: 
+</code> python<br />
+from twisted.internet import task<br />
+from twisted.internet import reactor<br />
+def runEverySecond():<br />
+    print “a second has passed”<br />
+l = task.LoopingCall(runEverySecond)<br />
+l.start(1.0) # call every second<br />
+# l.stop() will stop the looping calls<br />
+reactor.run()<br />
+<code>
+&gt; 如果我们要取消一个已经在调度(we have scheduled)的任务（应该是指已经加入调度队列的任务）： 
+</code> python<br />
+from twisted.internet import reactor<br />
+def f():<br />
+    print “I’ll never run.”<br />
+callID = reactor.callLater(5, f)<br />
+callID.cancel()<br />
+reactor.run()<br />
+```<br />
+&gt; 就像所有基于reactor的代码(reactor-based code)一样，为了让调度运行必须启动reactor: reactor.run().</p>
+
+<hr />
+<p>#2. twisted.enterprise.adbapi: Twisted RDBMS support</p>
+
+<blockquote>
+  <p>Twsited是一个异步网络框架，但是不幸的是大部分数据库API的实现都是阻塞接口—鉴于这个原因，twisted.enterprise.adbapi横空出世。它是针对标准 DB-API 2.0 API 的非阻塞接口，而且可以访问许多不同的RDBMSes.<br />
+enterpreise.adbapi会在单独的线程里面执行阻塞的数据库操作，当数据库操作完成的时候又会在原来的线程(originating thread，可能是说twisted的主事件循环线程)中触发回调。在此期间，原来的线程可以继续做正常的工作，比如服务于其他请求。<br />
+我们并非要直接创建数据库连接，而是用adbapi.ConnectionPool类管理数据库连接。这东东允许enterprise.adbapi使用多个数据库连接，每个线程一个。很简单:<br />
+<code>python
+# Using the "dbmodule" from the previous example, create a ConnectionPool 
+from twisted.enterprise import adbapi 
+dbpool = adbapi.ConnectionPool("dbmodule", 'mydb', 'andrew', 'password')
+</code><br />
+需要注意的是：<br />
+不需要直接import dbmodule。只用把module的名字传递给adbapi.ConnectionPool的构造函数就行了。<br />
+需要传递给dbmodule.connect()的参数应当做额外的参数传递给adbapi.ConnectionPool的构造函数。关键字参数也没问题。<br />
+现在我们来做一个数据库查询：<br />
+<code>python
+# equivalent of cursor.execute(statement), return cursor.fetchall():
+def getAge(user):
+  return dbpool.runQuery("SELECT age FROM users WHERE name = ?", user)
+def printResult(l):
+  if l:
+    print l[0][0], "years old"
+  else:
+    print "No such user"
+</code><br />
+除了getAge的返回值以外，其他都很直观。getAge返回了一个twisted.internet.defer.Deferred,这个Deferred允许在数据库操作完成的时候对于结果或者错误执行任意的callback。<br />
+除了runQuery,还有runOperation和runInteraction可以被调用。The function will be called in the thread with a twisted.enterprise.adbapi.Transaction, which basically mimics a DB-API cursor. 在所有情况下，一个数据库的事务会在这次数据库使用结束的时候提交，除非抛出了异常（如果抛出了异常就会回滚）。<br />
+<code>python
+def _getAge(txn, user):
+  # this will run in a thread, we can use blocking calls
+  txn.execute("SELECT * FROM foo")
+  # ... other cursor commands called on txn ...
+  txn.execute("SELECT age FROM users WHERE name = ?", user)
+  result = txn.fetchall()
+  if result:
+    return result[0][0]
+  else:
+    return None
+def getAge(user):
+  return dbpool.runInteraction(_getAge, user)
+def printResult(age):
+  if age != None:
+    print age, "years old"
+  else:
+    print "No such user"
+getAge("joe").addCallback(printResult)
+</code><br />
+这里都假定了dbmodule使用”qmark”风格的参数(parmstyle)(参见DB-API说明书)，这是不碍事的。如果我们的dbmodule要使用一种不同的参数风格(比如pyformat),那么直接用就是了。twisted没有试图提供任何类型的魔法参数转换—runQuery(query,aprams,…)直接映射到cursor.execute(query,params,…).<br />
+Examples of various database adapters <br />
+注意，第一个参数是我们要import和使用connect(…)的module的名字，接下来的参数是我们调用connect(…)的参数。<br />
+<code>python
+from twisted.enterprise import adbapi
+# Gadfly
+cp = adbapi.ConnectionPool("gadfly", "test", "/tmp/gadflyDB")
+# PostgreSQL PyPgSQL
+cp = adbapi.ConnectionPool("pyPgSQL.PgSQL", database="test")
+# MySQL
+cp = adbapi.ConnectionPool("MySQLdb", db="test")
+</code><br />
+===================================================================================================================================================================== <br />
+#3. Using Threads in Twisted &amp; Running code in a thread-safe manner <br />
+Twisted中的大部分代码非线程安全。例如，往一个protocol的transport写数据就不是线程安全的。所以，我们需要一种方式来把函数调度到主事件循环里面去运行。这个可用函数twisted.internet.interfaces.IReactorThreads.callFromThread来做到：</p>
+</blockquote>
+
+<pre><code class="language-python">from twisted.internet import reactor
+def notThreadSafe(x):
+   """do something that isn't thread-safe"""
+   # ...
+def threadSafeScheduler():
+  """Run in thread-safe manner."""
+  reactor.callFromThread(notThreadSafe, 3) # will run 'notThreadSafe(3)'
+                       # in the event loop
+</code></pre>
+<p>#4. Running code in threads <br />
+&gt; 有时我们需要在线程中运行函数–例如，要访问阻塞的API。twisted用IReactorThreads API(twisted.internet.interfaces.IReactorThreads)提供这种方法。其他的功能性函数在twisted.internet.threads中提供。基本上，这些方法可以让我们把函数排进队列里让线程池运行了。<br />
+例如，要在一个线程中运行一个函数我们可以这样做：</p>
+
+<pre><code class="language-python">from twisted.internet import reactor
+def aSillyBlockingMethod(x):
+  import time
+  time.sleep(2)
+  print x
+# run method in thread
+reactor.callInThread(aSillyBlockingMethod, "2 seconds have passed")
+reactor.run()
+</code></pre>
+<blockquote>
+  <p>功能性函数（utility methods）不是twisted.internet.reactor APIs的一部分，而是在twisted.internet.threads中实现。<br />
+如果我们有多个函数要在一个线程中序列化运行，我们可以这么做：<br />
+<code>python
+from twisted.internet import reactor, threads
+def aSillyBlockingMethodOne(x):
+  import time
+  time.sleep(2)
+  print x
+def aSillyBlockingMethodTwo(x):
+  print x
+# run both methods sequentially in a thread
+commands = [(aSillyBlockingMethodOne, ["Calling First"], {})]
+commands.append((aSillyBlockingMethodTwo, ["And the second"], {}))
+threads.callMultipleInThread(commands)
+reactor.run()
+</code><br />
+对于我们需要获取其结果的函数，我们可以让结果作为一个Deferred返回：<br />
+<code>python
+from twisted.internet import reactor, threads
+def doLongCalculation():
+  # .... do long calculation here ...
+  return 3
+def printResult(x):
+  print x
+# run method in thread and get result as defer.Deferred
+d = threads.deferToThread(doLongCalculation)
+d.addCallback(printResult)
+reactor.run()
+</code><br />
+如果我们要在reactor线程中调用一个函数并获取它的结果，我们可以用blockingCallFromThread:<br />
+<code>python
+from twisted.internet import threads, reactor, defer
+from twisted.web.client import getPage
+from twisted.web.error import Error
+def inThread():
+  try:
+    result = threads.blockingCallFromThread(
+      reactor, getPage, "http://twistedmatrix.com/")
+  except Error, exc:
+    print exc
+  else:
+    print result
+  reactor.callFromThread(reactor.stop)
+reactor.callInThread(inThread)
+reactor.run()
+</code><br />
+blockingCallFromThread将把传递给它的函数所返回的对象返回来、或者把传递给它的函数raise的异常raise出来。如果传给它的函数返回一个Deferred,那么它会返回Deferred的callback收到的数据或者raise Deferred的errback收到的异常（ If the function passed to it returns a Deferred, it will return the value the Deferred is called back with or raise the exception it is errbacked with. ）<br />
+Managing the Thread Pool <br />
+线程池由twisted.python.threadpool.ThreadPool实现。</p>
+</blockquote>
+
+<p>我们可能想修改threadpool的大小，增加或减少使用的线程的数量。我们可以很容易的做到：</p>
+
+<p>from twisted.internet import reactor<br />
+reactor.suggestThreadPoolSize(30)<br />
+线程池的默认大小取决于所使用的reactor；默认的reactor使用的线程池最小线程数为5最大线程数为10.在修改线程池大小之前一定要小心并且要保证已经理解线程以及线程对资源的使用。<br />
+===================================================================================================================================================================== <br />
+Deferred Reference <br />
+Defrereds <br />
+twisted用Deferred对象管理回调序列。客户程序把一系列的函数附加到deferred上，当异步请求的结果可用时这些函数会被调用,这一系列的函数就是回调(callback)，或者说回调链(callback chain).如果异步请求发生错误也会有一系列的函数被调用，这些函数就是错误回调(errback)或者错误回调链(errback chain)。当结果可用时异步库的代码调用第一个callback，或者当错误发生时调用第一个errback， Deferred对象会把每个callback/errback函数的结果hold住并传入链中的下一个函数 。</p>
+
+<p>twisted.internet.defer.Deferred对象是函数将会在某个点上产生结果的承诺。我们可以把callback函数附加到给一个Deferred，一旦Deferred得到了结果这些callbacks就会被执行。</p>
+
+<p>如果不显式的return a twisted.python.failure.Failure或者raise an exception，错误会停止传播 ，正常的callbacks会从这个点上继续执行(详情参见页面上的链路图，一个callback跟一个errback对应，每个callback(errback)的结果传递给下一个callback/errback，同级的errback(callback)没机会执行了)，使用errback返回的结果。如果确实return a twisted.python.failure.Failure或者raise an exception，那么错误会传递给下一个errback.</p>
+
+<p>如果一个errback不返回任何东西，就等效于返回了一个None对象，那么意味着callbacks会在这errback之后继续执行。callback会用None作为参数，所以要小心！</p>
+
+<p>twisted.python.failure.Failure实例有一个有用的函数叫trap,可用于作如下等效行为：</p>
+
+<p>try:<br />
+    # code that may throw an exception<br />
+    cookSpamAndEggs()<br />
+except (SpamException, EggException):<br />
+    # Handle SpamExceptions and EggExceptions<br />
+    …<br />
+等效于</p>
+
+<p>def errorHandler(failure):<br />
+    failure.trap(SpamException, EggException)<br />
+    # Handle SpamExceptions and EggExceptions<br />
+d.addCallback(cookSpamAndEggs)<br />
+d.addErrback(errorHandler)<br />
+如果传递给trap的参数跟Failure中封装的错误不匹配，trap会re-raise那个错误。</p>
+
+<p>twisted.internet.defer.Deferred.addCallbacks()</p>
+
+<h1 id="case-1">Case 1</h1>
+<p>d = getDeferredFromSomewhere()<br />
+d.addCallback(callback1)       # A<br />
+d.addErrback(errback1)         # B<br />
+d.addCallback(callback2)       <br />
+d.addErrback(errback2)        <br />
+# Case 2<br />
+d = getDeferredFromSomewhere()<br />
+d.addCallbacks(callback1, errback1)  # C<br />
+d.addCallbacks(callback2, errback2)<br />
+如果callback1中发生错误，Case 1中errback1会被调用来处理Failure；Case 2中errback2会被调用来处理Failure。</p>
+
+<p>在Case 1中，line A的callback会处理getDeferredFromSomewhere中的成功结果，line B的errback会处理上流代码(the upstream source)中的错误或者A中的错误。</p>
+
+<p>在Case 2中，line C的errback只处理getDeferredFromSomewhere中抛出的错误，不会处理callback1中抛出的错误。</p>
+
+<p>对于没有添加errback而发生错误的情况，Deferred被垃圾回收的时候，twisted会把错误的调用栈(traceback)打印到日志文件。所以要小心，如果我们保留了一个对Deferred的引用，从而阻止了它被垃圾回收，那么我们永远都看不到这个错误 （并且会发现我们的callback很神秘的从不被调用）。如果不确定是否有errback忘写，可以显式的在我们callbacks后面追加一个如下所示的errback：</p>
+
+<p>from twisted.python import log<br />
+d.addErrback(log.err)<br />
+Handling either synchronous or asynchronous results <br />
+有些应用程序中，函数要嘛是异步的(返回一个Deferred,当数据到达时fire这个Deferred)要嘛是同步的(立马返回一个结果)。不过，也有些函数需要同时接受立即结果和Deferreds.</p>
+
+<p>同步函数：</p>
+
+<p>def authenticateUser(isValidUser, user):<br />
+    if isValidUser(user):<br />
+        print “User is authenticated”<br />
+    else:<br />
+        print “User is not authenticated”<br />
+异步函数：<br />
+from twisted.internet import reactor, defer<br />
+def asynchronousIsValidUser(user):<br />
+    d = defer.Deferred()<br />
+    reactor.callLater(2, d.callback, user in [“Alice”, “Angus”, “Agnes”])<br />
+    return d<br />
+twisted.internet.defer.maybeDeferred()可以保证函数的返回值是一个Deferred，即使函数是一个同步函数：<br />
+from twisted.internet import defer<br />
+def printResult(result):<br />
+  if result:<br />
+    print “User is authenticated”<br />
+  else:<br />
+    print “User is not authenticated”<br />
+def authenticateUser(isValidUser, user):<br />
+  d = defer.maybeDeferred(isValidUser, user)<br />
+  d.addCallback(printResult)<br />
+isValidUser是synchronousIsValidUser或者asynchronousIsValidUser都行。</p>
+
+<p>当然，我们也可以修改synchronousIsValidUser使其返回一个Deferred.(https://twistedmatrix.com/documents/current/core/howto/gendefer.html)</p>
+
+<p>有时候我们需要在几个不同的事件都发生了才被通知，而不是分别等待每个事件。例如，我们可能需要等待一个列表中的连接全部关闭。 twisted.internet.defer.DeferredList就是干这个的。</p>
+
+<p>根据多个Deferred来创建一个DeferredList，我们只需简单的把一个存储着目标Deferred的list传递进去就行了：</p>
+
+<p>dl = defer.DeferredList([deferred1,deferred2,deferred3])<br />
+现在我们可以把DeferredList当成一个普通的Deferred对待；我们可以调用addCallbacks等方法。 DeferredList会在所有Deferreds完成的时候调用它的callback. callback会以DeferredList包含的所有Deferred的结果构成的list作为参数进行执行 ，like so:</p>
+
+<h1 id="a-callback-that-unpacks-and-prints-the-results-of-a-deferredlist">A callback that unpacks and prints the results of a DeferredList</h1>
+<p>def printResult(result):<br />
+  for (success, value) in result:<br />
+    if success:<br />
+      print ‘Success:’, value<br />
+    else:<br />
+      print ‘Failure:’, value.getErrorMessage()</p>
+
+<h1 id="create-three-deferreds">Create three deferreds.</h1>
+<p>deferred1 = defer.Deferred()<br />
+deferred2 = defer.Deferred()<br />
+deferred3 = defer.Deferred()</p>
+
+<h1 id="pack-them-into-a-deferredlist">Pack them into a DeferredList</h1>
+<p>dl = defer.DeferredList([deferred1, deferred2, deferred3], consumeErrors=True)</p>
+
+<h1 id="add-our-callback">Add our callback</h1>
+<p>dl.addCallback(printResult)</p>
+
+<h1 id="fire-our-three-deferreds-with-various-values">Fire our three deferreds with various values.</h1>
+<p>deferred1.callback(‘one’)<br />
+deferred2.errback(Exception(‘bang!’))<br />
+deferred3.callback(‘three’)</p>
+
+<h1 id="at-this-point-dl-will-fire-its-callback-printing">At this point, dl will fire its callback, printing:</h1>
+<p>#	Success: one<br />
+#	Failure: bang!<br />
+#	Success: three<br />
+# (note that defer.SUCCESS == True, and defer.FAILURE == False)<br />
+标准的DeferredList不会调用errback,但是传给DeferredList的Deferred发生的failure还是会调用errback除非DeferredList的consumeErrors被设成了True(这句话很绕，我理解的意思是，DeferredList只会等待所有Deferred的异步数据到大后才会执行callback,但是不会执行errback；而构成DeferredList的Deferred发生错误时还是可以调用自己的errback；要想阻止Deferred调用自己的errback,需要在构建DeferredList时设置参数consumeError=True.这个理解需要回头用程序验证一下！！)。<br />
+如果要为构成DeferredList的独立的Deffered提供callback，我们应该对于这些callback添加的时间点很小心。添加一个Deferred到DeferedList的行为实际上内部为Deferred插入了一个callback(当这个callback执行的时候，它检查DeferredList是否已经完成了(我理解的意思是，这个callback检测自己是否是最后一个完成的Deferred，如果是的话就可以调用DefferredList的callback了)).要记住的很重要的事情是，这个内部自动加入的callback它记录的值会是作为result list传入给DefferedList callback函数的东东。</p>
+
+<p>因此，如果我们在把Deferred加入到DeferredList之后再添加一个callback给Deferred，那么这个callback返回的值将不会传给DeferredList的callback（擦，这么说的话，DeferredList不但要等待它内部所有Deferred的数据到达，而且还要等所有Deferred的callback执行完成，然后把最后的结果合一起作为DeferredList等待的数据）. 为了避免困惑，我们建议不要在Deferred添加到DeferredList之后再为Deferred添加callback.</p>
+
+<p>def printResult(result):<br />
+  print result<br />
+def addTen(result):<br />
+  return result + “ ten”</p>
+
+<h1 id="deferred-gets-callback-before-deferredlist-is-created">Deferred gets callback before DeferredList is created</h1>
+<p>deferred1 = defer.Deferred()<br />
+deferred2 = defer.Deferred()<br />
+deferred1.addCallback(addTen)<br />
+dl = defer.DeferredList([deferred1, deferred2])<br />
+dl.addCallback(printResult)<br />
+deferred1.callback(“one”) # fires addTen, checks DeferredList, stores “one ten”<br />
+deferred2.callback(“two”)<br />
+# At this point, dl will fire its callback, printing:<br />
+#	 [(1, ‘one ten’), (1, ‘two’)]</p>
+
+<h1 id="deferred-gets-callback-after-deferredlist-is-created">Deferred gets callback after DeferredList is created</h1>
+<p>deferred1 = defer.Deferred()<br />
+deferred2 = defer.Deferred()<br />
+dl = defer.DeferredList([deferred1, deferred2])<br />
+deferred1.addCallback(addTen) # will run <em>after</em> DeferredList gets its value<br />
+dl.addCallback(printResult)<br />
+deferred1.callback(“one”) # checks DeferredList, stores “one”, fires addTen<br />
+deferred2.callback(“two”)<br />
+# At this point, dl will fire its callback, printing:<br />
+#	 [(1, ‘one), (1, ‘two’)]<br />
+Other behaviours <br />
+fireOnOneCallback DeferredList会在有Deferred调用callback时立马调用自己的callback,然后DeferredList不做任何事儿了，忽略其他还没完成的Deferred</p>
+
+<p>fireOnOneErrback DeferredList会在有Deferred调用errback时立马调用自己的errback,然后DeferredList不做任何事儿了，忽略其他还没完成的Deferred</p>
+
+<p>consumeErrors 阻止错误在DeferredList包含的任何Deferred的链路上传播（普通创建的DeferredList不会影响结果在它的Deferred的callbacks和errbacks中传递）。用这个选项在DeferedList中停止错误，将阻止“Unhandled error in Deferred”警告出现在DeferredList包含的没必要添加额外errbacks的Deferred中。设置consumeErrors参数为true不会改变fireOnOneCallback或者fireOnOneErrback.</p>
+
+<p>DeferredList的一个常见应用是join若干平行的异步操作，如果所有操作都成功就成功完成，如果任何一个操作失败就失败。这种情况下，twisted.internet.defer.gatherResults是一个有用的捷径：</p>
+
+<p>from twisted.internet import defer<br />
+d1 = defer.Deferred()<br />
+d2 = defer.Deferred()<br />
+d = defer.gatherResults([d1, d2], consumeErrors=True)<br />
+def printResult(result):<br />
+  print result<br />
+d.addCallback(printResult)<br />
+d1.callback(“one”)<br />
+# nothing is printed yet; d is still awaiting completion of d2<br />
+d2.callback(“two”)<br />
+# printResult prints [“one”, “two”]<br />
+consumeErrors参数跟DeferredList有一样的意义：如果为true,gatherResults会消耗掉传进来的Deferred的所有错误。这个参数都设为true吧，除非我们要为传进来的Deferred添加callbacks或者errbacks,或者除非我们知道他们不会失败。如果不设为true,失败会导致twisted记录一个unhandled error到日志里。这个参数从twisted 11.1.0之后有效。</p>
+
+      </article>
+      <hr>
+      <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a><a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a><a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a></div>
+      <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+    </div>
+    <div class="post-area post comment">
+      <!-- 多说评论框 start -->
+      
+      <div class="ds-thread" data-thread-key="/2015/01/15/adbapi" data-title="Twisted adb模块 api" data-url="gaohaoyang.github.io/2015/01/15/adbapi/"></div>
+      
+      <!-- 多说评论框 end -->
+    </div>
+  </div>
+
+  <div id="content" class="col-sm-3">
+    <!-- <div id="myAffix" class="shadow-bottom-center hidden-xs" data-spy="affix" data-offset-top="0" data-offset-bottom="-20"> -->
+    <div id="myAffix" class="shadow-bottom-center hidden-xs" >
+      <div class="categories-list-header">
+        Content
+      </div>
+      <div class="content-text"></div>
+    </div>
+  </div>
+</div>
+    </div>
+
+    
+    <div id="top" data-toggle="tooltip" data-placement="left" title="回到顶部">
+      <a href="javascript:;">
+        <div class="arrow"></div>
+        <div class="stick"></div>
+      </a>
+    </div>
+
+    <footer class="">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <a href="mailto:408446482@qq.com"><span class="glyphicon glyphicon-envelope"></span> 408446482@qq.com</a>
+        <span class="point"> · </span>
+        
+          
+          <a href="https://github.com/zebulonzh">
+            <span class="icon">
+              <svg viewBox="0 0 16 16">
+                <path fill="#aaa" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+              </svg>
+            </span>
+            Github
+            <!-- <span>zebulonzh</span> -->
+          </a>
+          
+          
+          <span class="point"> · </span>
+          <span><a href="/feed.xml">RSS</a></span>
+          <span class="point"> · </span>
+          <span>Stories About the Indie Game Developer</span>
+          <span class="point"> · </span>
+          <span>&copy; Designed by <a href="https://github.com/Gaohaoyang">HyG</a></span>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- 在新窗口中打开 -->
+  <script type="text/javascript">
+    function addBlankTargetForLinks () {
+      $('a[href^="http"]').each(function(){
+          $(this).attr('target', '_blank');
+      });
+    }
+    $(document).bind('DOMNodeInserted', function(event) {
+      addBlankTargetForLinks();
+    });
+  </script>
+  </body>
+</html>

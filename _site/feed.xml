@@ -5,22 +5,117 @@
     <description>Stories About the Indie Game Developer</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 22 Aug 2015 21:19:50 +0800</pubDate>
-    <lastBuildDate>Sat, 22 Aug 2015 21:19:50 +0800</lastBuildDate>
+    <pubDate>Sun, 23 Aug 2015 02:29:32 +0800</pubDate>
+    <lastBuildDate>Sun, 23 Aug 2015 02:29:32 +0800</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
-        <title>1</title>
+        <title>cocos ide踩坑记录</title>
+        <description>&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#section&quot;&gt;0.写在前面&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-1&quot;&gt;1.版本适配&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-2&quot;&gt;2.建立工程&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-3&quot;&gt;3.编译运行&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;0.写在前面&lt;/h2&gt;
+
+&lt;p&gt;目前ide有两个版本，1.2.0的eclipse版和2.0BETA的IDEA版，前者虽然bug百出，性能很差，但是基本功能还算齐全，后者性能有很大提升，但是由于是BETA版，所以功能少很多，尤其是lua方面，代码提示和打包都没有，我们项目使用lua，所以只好选择前者，但愿IDEA能发展的好一点吧。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;1.版本适配&lt;/h2&gt;
+
+&lt;p&gt;首先，项目需要对c++部分做修改，所以无法使用framework，这里我就不吐槽cocos的下载bug了。&lt;br /&gt;
+其次，1.2release版的ide其实是和v3.4版的c2d-x engine适配的，这一点我没有看到任何官方的提示或者说明，只能自己一个版本一个版本测试。如果使用v3.5及以上的engine，ide的工程目录会找不到对应版本的api。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;2.建立工程&lt;/h2&gt;
+
+&lt;p&gt;由于使用的是engine，所以通过cocos new建立工程，之后在ide中导入工程，其工程文件是隐藏的，选中目录即可。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;3.编译运行&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;engine的空项目第一次编译运行时，会提示你没有模拟器，而framework是已经自带了的，我使用的是macbook，所以构建了mac的模拟器，但是运行的时候，出现error&lt;/p&gt;
+
+    &lt;p&gt;&lt;code&gt;
+  cocos2d: fullPathForFilename: No file found at config.json. Possible missing file.
+  &lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个问题是源码lua部分的模板有bug，在”cocos/cocos2d/Cocos2dConstants.lua”最下面，有个叫做cc.AsyncTackPool.TaskType的table,在这个表之前给他初始化一下或者整个注释起来都可以。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;继续运行的时候时，会遇到这个error&lt;br /&gt;
+  &lt;code&gt;Unable to load nib file: MainMenu&lt;/code&gt;&lt;br /&gt;
+  这个是模拟器的问题，之前构建的模拟器不能用，需要用Xcode打开其runtime，然后把mac版选为target，clean，build&amp;amp;run，跑起来之后，模拟器的文件夹会出现新的模拟器，这个模拟器是Xcode生成的。然后检查一下ide中对于模拟器的选择了路径是否正确，不出意外的话，这次应该可以在ide中跑起来了&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Fri, 17 Jul 2015 10:33:00 +0800</pubDate>
+        <link>/2015/07/17/cocos-ide-question/</link>
+        <guid isPermaLink="true">/2015/07/17/cocos-ide-question/</guid>
+        
+        
+        <category>ide</category>
+        
+      </item>
+    
+      <item>
+        <title>cocos3.0+ListView等出现绿色显示错误</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;问题&lt;br /&gt;
+    使用了ListView,ScrollView,PageView等控件后（尤其是在cocostudio中使用），安卓设备上会出现绿色的区域，而不是这些控件&lt;/li&gt;
+  &lt;li&gt;解决&lt;br /&gt;
+    只需要修改AppActivity.java，将TestCpp里面的代码直接拷贝进去覆盖，即可解决上述问题。&lt;br /&gt;
+主要是这个函数:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;public Cocos2dxGLSurfaceView onCreateView() {  
+       Cocos2dxGLSurfaceView glSurfaceView = new Cocos2dxGLSurfaceView(this);  
+       // TestCpp should create stencil buffer  
+       glSurfaceView.setEGLConfigChooser(5, 6, 5, 0, 16, 8);  
+       return glSurfaceView;  
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Tue, 14 Jul 2015 19:49:00 +0800</pubDate>
+        <link>/2015/07/14/ListView-Android/</link>
+        <guid isPermaLink="true">/2015/07/14/ListView-Android/</guid>
+        
+        
+        <category>cocos</category>
+        
+      </item>
+    
+      <item>
+        <title>简体转繁体</title>
         <description>&lt;p&gt;项目需要发行台湾版本，也就是繁体版，需要把所有策划案，数值表和代码文件提供给台湾运营商然后人肉翻译，这个脚本就是为了解救生活于水深火热的台湾同胞而产生的。&lt;br /&gt;
 这个脚本的思路是读取文件-&amp;gt;decode原始字符-&amp;gt;简体转繁体-&amp;gt;encode-&amp;gt;输出文件。&lt;br /&gt;
-实际生产环境中，decode和简转繁过程有几个问题：&lt;br /&gt;
-* 各个需要转换的文件于不同时期，用不同的工具，由不同的人制作，所以文件之间有相当大的可能性存在字符集不同一的问题，甚至同一个文件中不同行的字符集都不同。另外，文件中全角半角符号不统一也很常见，导致python中decode这些字符的时候会乱码或者error。&lt;br /&gt;
-* 简体转繁体不是简单的将简体字转换为繁体字，双方的语言习惯上也有很大不同，举个例子，大陆的”服务器“在台湾叫做”伺服器“，类似的还有很多，甚至句子的词序也会不同&lt;/p&gt;
+实际生产环境中，decode和简转繁过程有几个问题：&lt;/p&gt;
 
-&lt;p&gt;解决方法：&lt;br /&gt;
-* 按行读取文件，然后分析该行的字符集，然后针对该字符集进行decode，最后全角转半角。&lt;br /&gt;
-* 简转繁有现成的py开源库，用到两个文件，&lt;a href=&quot;https://github.com/skydark/nstools/blob/master/zhtools/zh_wiki.py&quot;&gt;zh_wiki.py&lt;/a&gt;和&lt;a href=&quot;https://github.com/skydark/nstools/blob/master/zhtools/langconv.py&quot;&gt;langconv.py&lt;/a&gt;,例如使用Converter(“zh-hant”).convert(line)就可以将一行简体半角unicode转为繁体,第一个文件是从wiki上扒下来的简体繁体对应字典，包含了字词的转换，无法完成对句子的处理，但是根据台湾方面的反应，这样的转换效果已经大大超出了他们的预期，同样超过了boss对我的预期。。。&lt;br /&gt;
-* 全角符号的范围在[65281,65374]之间，且除了空格之外，都比对应的半角字符大了65245，全角空格是12288，半角是32，所以根据ord（uchar）判断字符全角还是半角然后进行处理即可。&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;各个需要转换的文件于不同时期，用不同的工具，由不同的人制作，所以文件之间有相当大的可能性存在字符集不同一的问题，甚至同一个文件中不同行的字符集都不同。另外，文件中全角半角符号不统一也很常见，导致python中decode这些字符的时候会乱码或者error。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;简体转繁体不是简单的将简体字转换为繁体字，双方的语言习惯上也有很大不同，举个例子，大陆的”服务器“在台湾叫做”伺服器“，类似的还有很多，甚至句子的词序也会不同&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;解决方法：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;按行读取文件，然后分析该行的字符集，然后针对该字符集进行decode，最后全角转半角。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;简转繁有现成的py开源库，用到两个文件，&lt;a href=&quot;https://github.com/skydark/nstools/blob/master/zhtools/zh_wiki.py&quot;&gt;zh_wiki.py&lt;/a&gt;和&lt;a href=&quot;https://github.com/skydark/nstools/blob/master/zhtools/langconv.py&quot;&gt;langconv.py&lt;/a&gt;,例如使用Converter(“zh-hant”).convert(line)就可以将一行简体半角unicode转为繁体,第一个文件是从wiki上扒下来的简体繁体对应字典，包含了字词的转换，无法完成对句子的处理，但是根据台湾方面的反应，这样的转换效果已经大大超出了他们的预期，同样超过了boss对我的预期。。。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;全角符号的范围在[65281,65374]之间，且除了空格之外，都比对应的半角字符大了65245，全角空格是12288，半角是32，所以根据ord（uchar）判断字符全角还是半角然后进行处理即可。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# coding = utf-8
 import os, re, platform, chardet, linecache, sys, codecs
@@ -153,11 +248,95 @@ else :
 &lt;/ul&gt;
 </description>
         <pubDate>Mon, 15 Jun 2015 16:51:00 +0800</pubDate>
-        <link>/2015/06/15/1/</link>
-        <guid isPermaLink="true">/2015/06/15/1/</guid>
+        <link>/2015/06/15/jiantizhuanfanti/</link>
+        <guid isPermaLink="true">/2015/06/15/jiantizhuanfanti/</guid>
         
-        <category>Python</category>
         
+        <category>python</category>
+        
+      </item>
+    
+      <item>
+        <title>文件名格式检查</title>
+        <description>&lt;p&gt;这个脚本现在用于上个项目中，负责对所有打包文件的命名检查，该脚本的主要特点如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;接受两个命令行参数用于指定搜索路径和日志保存路径，可以方便的嵌入QA的脚本链中。&lt;/li&gt;
+  &lt;li&gt;如果检查出指定目录（及其递归子目录）中有非法文件，会保存在以当前时间命名的log文件中，全部合格则不会产生该文件&lt;/li&gt;
+  &lt;li&gt;代码比较硬，两段注释起来的部分是用来对指定后缀的文件进行检查，之前是这样写的，不过QA说直接检查所有文件就行，于是就雪藏了&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# -*-coding: utf-8 -*-
+#param[1]:the absolute path of the root to search
+#param[2]:the absolute path of the log file to saved
+
+import os, re, sys, time
+
+def checkName(name):
+	pattern = re.compile(&quot;\W&quot;)	#only numbers, charactors and underline
+	match = pattern.search(name)
+	if not match:
+		return False;
+	else:
+		return True
+
+assert len(sys.argv) &amp;gt;= 2, &quot;PARAM ERROR: Need a root path&quot;
+assert len(sys.argv) &amp;gt;= 3, &quot;PARAM ERROR: Need a output path&quot;
+
+print &quot;\n================Scanning================\n&quot;
+logTime = time.strftime(&quot;%m-%d-%H-%M-%S&quot;, tiem.localtime(time.time()))
+
+fileName = &quot;&quot;
+if sys.argv[2][-1]!=os.sep:
+	fileName = sys.argv[2] + os.sep + logTime + &quot;.txt&quot;
+else:
+	fileName = sys.argv[2] + logTime + &quot;.txt&quot;
+
+logFile = open(fileName, &quot;w&quot;)
+if not logFile:
+	print &quot;Log File can&#39;t create!&quot;
+	os.system(&quot;pause&quot;)
+
+num = 0
+totalNum = 0
+
+&#39;&#39;&#39;
+extList = [&quot;.lua&quot;, &quot;.ccbi&quot;, &quot;.png&quot;, &quot;.plist&quot;]
+&#39;&#39;&#39;
+for dirPath, dirNames, fileNames in os.walk (sys.argv[1]):
+	for f in fileNames:
+		ext = os.path.splitext(f)
+		totalNum += 1
+		if checkName(f[:len(ext[0])]):
+			num += 1
+			logFile.write(os.path.join(dirPath, f) + &quot;\n&quot;)
+			print os.path.join(dirPath, f)
+		&#39;&#39;&#39;
+		for suffix in extList:
+			in ext[1] = suffix:
+			totalNum += 1
+			if checkName(f[:len(ext[0])]):
+				num += 1
+				logFile.write(os.path.join(dirPath,f) +&quot;\n&quot;)
+				print os.path.join(dirPath,f)
+		&#39;&#39;&#39;
+logFile.close()
+
+print &quot;\n================Finished================\n&quot;
+print &quot;%d&quot; % totalNum + &quot;files checked&quot;
+print &quot;%d&quot; % num + &quot;error(s)&quot;
+if num == 0:
+	os.remove(fileName)
+else:
+	print &quot;Logdata is saved in &quot; + fileName
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Mon, 15 Jun 2015 15:39:00 +0800</pubDate>
+        <link>/2015/06/15/wenjianmingjiancha/</link>
+        <guid isPermaLink="true">/2015/06/15/wenjianmingjiancha/</guid>
+        
+        
+        <category>python</category>
         
       </item>
     
@@ -209,6 +388,30 @@ else :
         
         
         <category>cocos</category>
+        
+      </item>
+    
+      <item>
+        <title>VS 无法查找或加载PDB模块</title>
+        <description>&lt;h3 id=&quot;section&quot;&gt;解决方案&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;以VS2012为例，在工具栏中打开底部的选项&lt;/li&gt;
+  &lt;li&gt;调试-&amp;gt;常规，勾选“启用源服务器支持”，出现警告，确认。&lt;/li&gt;
+  &lt;li&gt;调试-&amp;gt;符号，勾选Microsoft符号服务器，出现警告，确认。&lt;/li&gt;
+  &lt;li&gt;F5正常调试&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;第一次运行时会出现从Microsoft下载符号的对话框，会比较慢，耐心等下，以后不会每次都下载&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Tue, 03 Mar 2015 21:25:00 +0800</pubDate>
+        <link>/2015/03/03/VS/</link>
+        <guid isPermaLink="true">/2015/03/03/VS/</guid>
+        
+        
+        <category>ide</category>
         
       </item>
     
@@ -675,6 +878,833 @@ Options:       &lt;/p&gt;
         
         
         <category>other</category>
+        
+      </item>
+    
+      <item>
+        <title>cocos+lua 最佳实践</title>
+        <description>&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#cclua&quot;&gt;第一层：纯C环境下，把C函数注册进Lua环境&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#cocos2d-xclua&quot;&gt;第二层：在cocos2d-x环境下，把C函数注册进Lua环境&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#toluac&quot;&gt;第三层：了解为什么要使用toLua++来注册C++类&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#ctoluaclua&quot;&gt;第四层：在纯C++环境下，使用toLua++来把一个C++类注册进Lua环境&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#cocos2d-xclua-1&quot;&gt;第五层：使用cocos2d-x的方式来将C++类注册进Lua环境&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;关于cocos2d-x下Lua调用C++的文档看了不少，但没有一篇真正把这事给讲明白了，我自己也是个初学者，摸索了半天，总结如下：&lt;/p&gt;
+
+&lt;p&gt;cocos2d-x下Lua调用C++这事之所以看起来这么复杂、网上所有的文档都没讲清楚，是因为存在5个层面的知识点：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;在纯C环境下，把C函数注册进Lua环境，理解Lua和C之间可以互相调用的本质&lt;/li&gt;
+  &lt;li&gt;在cocos2d-x项目里，把纯C函数注册进Lua环境，理解cocos2d-x是怎样创建Lua环境的、以及怎样得到这个环境并继续自定义它 &lt;/li&gt;
+  &lt;li&gt;了解为什么要使用toLua++来注册C++类&lt;/li&gt;
+  &lt;li&gt;在纯C++环境下，使用toLua++来把一个C++类注册进Lua环境，理解toLua++的用法 5、在cocos2d-x项目里，使用cocos2d-x注册自身的方式把自定义的C++类注册进Lua环境，理解cocos2d-x是怎样通过bindings-generator脚本来封装toLua++的用法来节省工作量的&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;只有理解了前4层，在最后使用bindings-generator脚本的时候心里才会清清楚楚。而网上的文档，要么是只解释了第1层，要么是只填鸭式地告诉你第5层怎么用bindings-generator脚本，不仅中间重要的知识点一概不提，示例代码往往也写的不够简洁，这让我这种看见C++就眼晕的人理解起来大为头疼（不是我不会C++，而是我非常不接受C++的设计哲学，能避就避）。所以接下来的讲解我会对每一层知识点逐一讲解，示例代码也不求完整严谨，而是尽量用最简洁的方式把程序的关键点说明白。&lt;/p&gt;
+
+&lt;h2 id=&quot;cclua&quot;&gt;第一层：纯C环境下，把C函数注册进Lua环境&lt;/h2&gt;
+
+&lt;p&gt;直接看代码比啰哩啰嗦讲一大堆概念要清晰明了的多。建立一个a.lua和一个a.c文件，内容如下，一看就明白是怎么回事了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-lua&quot;&gt;--a.lua
+print(foo(99))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-c&quot;&gt;//a.c
+
+#include &amp;lt;lua.h&amp;gt;
+#include &amp;lt;lualib.h&amp;gt;
+#include &amp;lt;lauxlib.h&amp;gt;
+
+int foo(lua_State *L)
+{
+  int n = lua_tonumber(L, 1);
+
+  lua_pushnumber(L, n + 1);
+
+  return 1;
+}
+
+int main()
+{
+  lua_State *L = lua_open();
+
+  luaL_openlibs(L);
+
+  lua_register(L, &quot;foo&quot;, foo);
+
+  luaL_dofile(L, &quot;a.lua&quot;);
+
+  lua_close(L);
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;怎么样，这代码简单吧？一看就明白，简单的不能再简单了。我特别烦示例代码里又是判断错误又是加代码注释的，本来看自己不会的代码就够吃力的了，还加那么多花花绿绿的干扰项，纯粹增加学习负担。&lt;br /&gt;
+在命令行下用gcc来编译并执行吧：&lt;br /&gt;
+&lt;code&gt;
+gcc a.c -llua &amp;amp;&amp;amp; ./a.out
+&lt;/code&gt;&lt;br /&gt;
+注意-llua选项是必要的，因为要连接lua的库。&lt;/p&gt;
+
+&lt;p&gt;看完上面那段代码，再解释起来就容易多了：&lt;/p&gt;
+
+&lt;p&gt;1、要想注册进Lua环境，函数需要定义为这个样：int xxx(lua_State *L)&lt;br /&gt;
+2、使用lua_tonumber、lua_tostring等函数，来取得传入的参数，比如lua_tonumber(L, 1)就是得到传入的第一个参数，且类型为数字&lt;br /&gt;
+3、使用lua_pushnumber、lua_pushstring等函数，来将返回值压入Lua的环境中，因为Lua支持函数返回多个值，所以可以push多个返回值进Lua环境&lt;br /&gt;
+4、最终函数返回的数字表示有多少个返回值被压入了Lua环境 5、使用lua_register宏定义来将这个函数注册进Lua环境，Lua脚本里就可以用它了，大功告成！就这么简单！&lt;/p&gt;
+
+&lt;h2 id=&quot;cocos2d-xclua&quot;&gt;第二层：在cocos2d-x环境下，把C函数注册进Lua环境&lt;/h2&gt;
+
+&lt;p&gt;也简单：&lt;/p&gt;
+
+&lt;p&gt;1、在frameworks/runtime-src/Classes/目录下，找到AppDelegate.cpp文件。如果frameworks目录不存在，则需要参考这篇Blog：用Cocos Code IDE写Lua，如何与项目中的C++代码和谐相处&lt;/p&gt;
+
+&lt;p&gt;AppDelegate.cpp文件中的关键代码如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;auto engine = LuaEngine::getInstance();
+ScriptEngineManager::getInstance()-&amp;gt;setScriptEngine(engine);
+
+LuaStack* stack = engine-&amp;gt;getLuaStack();
+stack-&amp;gt;setXXTEAKeyAndSign(&quot;2dxLua&quot;, strlen(&quot;2dxLua&quot;), &quot;XXTEA&quot;, strlen(&quot;XXTEA&quot;));
+
+//register custom function
+//LuaStack* stack = engine-&amp;gt;getLuaStack();
+//register_custom_function(stack-&amp;gt;getLuaState());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可以看到cocos2d-x已经为我们留出了注册自定义C函数的位置，在注释代码后面这么写就可以了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;lua_State *L = stack-&amp;gt;getLuaState()；
+lua_register(L, &quot;test_lua_bind&quot;, test_lua_bind);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也可以通过ScriptEngineManager类从头取得当前的LuaEngine对象，然后再getLuaStack()方法得到封装的LuaStack对象，再调用getLuaState()得到原始的lua_State结构指针。只要知道了入口位置，其他一切就不成问题了，还是挺简单的。&lt;/p&gt;
+
+&lt;p&gt;感兴趣的话可以去看一下ScriptEngineManager类的详细定义，在frameworks/cocos2d-x/cocos/base/CCScriptSupport.h文件中。&lt;/p&gt;
+
+&lt;p&gt;BTW：这里还有一个小知识点，插入在AppDelegate.cpp中的自定义代码尽量写在COCOS2D_DEBUG宏定义的判断前面，因为在调试环境下和真机环境下后续执行的代码是不一样的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;#if (COCOS2D_DEBUG&amp;gt;0)
+    if (startRuntime())
+        return true;
+#endif
+
+    // 调试环境下代码就不会走到这里了
+    engine-&amp;gt;executeScriptFile(ConfigParser::getInstance()-&amp;gt;getEntryFile().c_str());
+    return true;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2、接下来，找个地方把test_lua_bind函数定义写进去就算大功告成了。如果追求文件组织的优雅，按理说应该新建一个.c文件，但这样的话搞不好会把自己陷入到编译阶段的泥潭里，所以先不追求优雅，而就在AppDelegate.cpp文件末尾写上函数的定义就可以了，简单清楚明了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;int test_lua_bind(lua_State *L)
+{
+    int number = lua_tonumber(L, 1);
+
+    number = number + 1;
+
+    lua_pushnumber(L, number);
+
+    return 1;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;3、大功告成，现在就可以在main.lua文件里使用test_lua_bind()函数了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-lua&quot;&gt;  local i = test_lua_bind(99)
+  print(&quot;lua bind: &quot; .. tostring(i))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;4、如果是新建一个.c文件呢？把AppDelegate.cpp文件里test_lua_bind函数定义的代码删掉，在头部#include后面加入：&lt;br /&gt;
+&lt;code&gt;#include &quot;test_lua_bind.h&quot;&lt;/code&gt;&lt;br /&gt;
+在frameworks/runtime-src/Classes目录下创建test_lua_bind.h文件，内容如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;extern &quot;C&quot; {
+#include &quot;lua.h&quot;
+#include &quot;lualib.h&quot;
+}
+
+int test_lua_bind(lua_State *L);
+再创建test_lua_bind.c文件，内容不变：
+
+#include &quot;test_lua_bind.h&quot;
+
+int test_lua_bind(lua_State *L)
+{
+    int number = lua_tonumber(L, 1);
+
+    number = number + 1;
+
+    lua_pushnumber(L, number);
+
+    return 1;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;此时用&lt;code&gt;cocos compile -p mac&lt;/code&gt;命令编译，会发现test_lua_bind.c文件并没有被编译。这是当然的，普通的C/C++项目都是用Makefile来指定编译哪些.c/cpp文件的，当前的cocos2d-x项目虽然没有Makefile文件，但也是遵循这个原则的，也即肯定是有一个地方来指定所有要编译的文件的，需要在这个地方把test_lua_bind.c加进去，使得整个项目编译时把它也作为项目的一部分。&lt;/p&gt;
+
+&lt;p&gt;答案是，cocos2d-x项目没有使用Makefile，而是非常聪明地使用了与具体环境相关的工程文件来作为命令行编译的环境，比如在编译iOS或Mac时就使用Xcode工程文件，在编译Android时就使用Android.mk文件。&lt;/p&gt;
+
+&lt;p&gt;所以，添加好了test_lua_bind.h和test_lua_bind.c文件后，用Xcode打开项目，将这俩文件添加进工程中就行了。&lt;/p&gt;
+
+&lt;p&gt;Xcode中添加.h和.cpp文件进工程&lt;/p&gt;
+
+&lt;p&gt;注意，千万不要勾选“Copy items into destination group’s folder(if needed)”，因为cocos2d-x的Xcode工程目录组织不是常规的结构，一旦勾选这个，会导致这两个文件被拷贝至frameworks/runtime-src/proj.ios_mac目录下，原来frameworks/runtime-src/Classes目录下的文件就废掉了，这样的组织方式会乱，而且会影响Android那边对这俩文件的引用。&lt;/p&gt;
+
+&lt;p&gt;把test_lua_bind.h和test_lua_bind.cpp这俩文件添加进Xcode工程后，再去命令行执行cocos compile -p mac，编译就能成功了。&lt;/p&gt;
+
+&lt;p&gt;网上有其他文章说还要修改Xcode工程的“User Headers Path”，这个经过试验是不需要的，哪怕把这俩文件放进新建的文件夹里也不需要，只要加入了Xcode工程即可，因为Xcode内部根本就不是按照文件夹的形式来组织文件的，它自己有一套叫做“Group”的东西。搞了好几年iOS开发，对Xcode的这个特性还是熟悉的。&lt;/p&gt;
+
+&lt;p&gt;说到这就不禁要插一句对网上所有cocos2d-x文档的吐槽了，学习cocos2d-x的人水平实在是良莠不齐，大部分人似乎都是对游戏热衷的编程初学者，他们大多底子薄基础差，甚至一大部分人之前都没做过移动APP的开发，他们学习cocos2d-x只想知其然而不想知其所以然，给他们讲他们也看不明白（因为编程基础差），所以网上不少cocos2d-x文章都是只讲123步骤，而不告诉你为什么这么做，包括cocos2d-x官方的大量文档也是基于这个思路写的，中文和英文都一样。我看这些文章就特别痛苦，一边看一边心里就总是在想，“凭什么要这么做啊”、“这一步是为了什么啊”、“怎么这么麻烦啊”、“这个步骤明显不是最佳实践啊”、“解决这事为啥要这么麻烦”、“有更好的方法吗”，所以我这种初学者来看cocos2d-x文档就变成了不是单纯的学习，而是学习、质疑、求证、反思、优化的过程，对别人来说cocos2d-x的入门比较容易，到我这里反倒成了入门比较难、入门之后比较容易了，因为文档中的垃圾信息和无效信息实在是太多了，别人可以照单全收、以后懂了之后再慢慢剔除，我是必须从一开始就自己甄别垃圾、只保留最佳实践，这也是这篇Blog写的比较长的原因。&lt;/p&gt;
+
+&lt;p&gt;扯远了。反正经过以上步骤，就完成了在cocos2d-x项目中把C函数注册进Lua环境这件事。至此，算是彻底搞懂了Lua和C函数之间的互相调用关系，也能在cocos2d-x的Lua环境中使用自定义的C函数了。但这还不够，因为一个正规的项目是需要狠好的组织结构的，全局C函数满天飞肯定是不行的，好一点的情况是把所有的C函数都在Lua中组织为模块注册进去，更好一点的情况是把C++类注册进Lua、并且C++类也是以Lua模块为组织方式注册进Lua环境的。这其实就是cocos2d-x自己把自己注册进Lua环境的方式。&lt;/p&gt;
+
+&lt;h2 id=&quot;toluac&quot;&gt;第三层：了解为什么要使用toLua++来注册C++类&lt;/h2&gt;
+
+&lt;p&gt;因为Lua的本质是C，不是C++，Lua提供给C用的API也都是基于面向过程的C函数来用的，要把C++类注册进Lua形成一个一个的table环境是不太容易一下子办到的事，因为这需要绕着弯地把C++类变成各种其他类型注册进Lua，相当于用面向过程的思维来维护一个面向对象的环境。这其中的细节就不去深究了，总之正是因为如此，所以单纯地手写lua_register()等代码来注册C++类是行不通的、代价高昂的，所以需要借助toLua++这个工具。&lt;/p&gt;
+
+&lt;p&gt;这一层的知识点看似简单，但其实是非常重要的，只有理解了手工用lua_register()去注册C++类的难度，才能理解使用toLua++这类工具的必要性。只有理解了使用toLua++工具的必要性，才会潜下心来冷静地接受toLua++本身的优点和缺点。只有看到了toLua++本身的缺点和使用上的麻烦，才会真心理解cocos2d-x使用bindings-generator脚本带来的好处。只有理解了bindings-generator脚本带来的好处，才能谅解这个脚本本身在使用上的一些不便之处。&lt;/p&gt;
+
+&lt;h2 id=&quot;ctoluaclua&quot;&gt;第四层：在纯C++环境下，使用toLua++来把一个C++类注册进Lua环境&lt;/h2&gt;
+
+&lt;p&gt;虽然终极方法是用bindings-generator脚本来注册C++类进cocos2d-x的Lua环境，但理解toLua++本身的用法还是狠有必要的，只有知道了toLua++原本的用法，才能更好地理解cocos2d-x是怎么把自己的C++类都注册进Lua环境的，这不仅能让编程时的思路更加清晰，也能为日后在源码中寻找各种接口文档的过程中不至于看不懂那一大堆tolua_beginmodule、tolua_function是什么意思。影响程序员学习提高的一大障碍就是忽略那些一知半解的代码，不去刨根究底地搞明白。&lt;/p&gt;
+
+&lt;p&gt;使用toLua++的标准做法是：&lt;/p&gt;
+
+&lt;p&gt;1、准备好自己的C++类，该怎么写就怎么写&lt;br /&gt;
+2、仿造这个类的.h文件，改一个.pkg文件出来，具体格式要按照toLua++的规定，比如移除所有的private成员等 3、建一个专门用来桥接C++和Lua之间的C++类，使用特殊的函数签名来写它的.h文件，.cpp文件不写，等着toLua++来生成&lt;br /&gt;
+4、给这个桥接的C++类写一个.pkg文件，按照toLua++的特殊格式来写，目的是把真正做事的C++类给定义进去 5、在命令行下用toLua++生成桥接类的.cpp文件&lt;br /&gt;
+6、程序入口引用这个桥接类，执行生成的桥接函数，Lua环境中就可以使用真正做事的C++类了&lt;/p&gt;
+
+&lt;p&gt;toLua++这种自己手写.pkg文件的方式古老又难受，所以我没有仔细地去学习，这套流程放在10年前的那个年代是没有太大问题的，作者怎么规定就怎么用好了，但是放在2014年的今天，任何程序的架构设计都讲究学习成本低、轻量化、符合以往的习惯，因此toLua++用起来我觉得其实是难受的。&lt;/p&gt;
+
+&lt;p&gt;下面我以尽量最少的代码来走一遍toLua++的流程，注意这是在纯C++环境下，跟任何框架都没关系，也不考虑内存释放等细节：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;//MyClass.h
+
+class MyClass {
+public:
+  MyClass() {};
+
+  int foo(int i);
+};
+MyClass.cpp
+
+#include &quot;MyClass.h&quot;
+
+int MyClass::foo(int i)
+{
+  return i + 100;
+}
+MyClass.pkg
+
+class MyClass
+{
+  MyClass();
+  int foo(int i);
+};
+MyLuaModule.h
+
+extern &quot;C&quot; {
+#include &quot;tolua++.h&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;#include &quot;MyClass.h&quot;
+
+TOLUA_API int tolua_MyLuaModule_open(lua_State* tolua_S);
+MyLuaModule.pkg
+
+#include &quot;MyLuaModule.h&quot;
+
+pfile &quot;MyClass.pkg&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;//main.cpp
+
+extern &quot;C&quot; { 
+#include &amp;lt;lua.h&amp;gt;
+#include &amp;lt;lualib.h&amp;gt;
+#include &amp;lt;lauxlib.h&amp;gt;
+}
+
+#include &quot;MyLuaModule.h&quot;
+
+int main()
+{
+  lua_State *L = lua_open();
+
+  luaL_openlibs(L);
+
+  tolua_MyLuaModule_open(L);
+
+  luaL_dofile(L, &quot;main.lua&quot;);
+
+  lua_close(L);
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-lua&quot;&gt;main.lua
+local test = MyClass:new()
+print(test:foo(99))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;先在命令行下执行：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;tolua++ -o MyLuaModule.cpp MyLuaModule.pkg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;此命令用来生成桥接文件MyLuaModule.cpp。注意命令行中-o参数的顺序不能随意摆放，从这个小事也能看出tolua++的古老和难用&lt;/p&gt;
+
+&lt;p&gt;生成好MyLuaModule.cpp文件后，就能看到它里面的那一大堆桥接代码了，比如tolua_beginmodule、tolua_function等。以后看到这些东西就不陌生了，就明白这些函数只是toLua++用来做桥接的必备代码了，简单看一下代码，就理解toLua++是怎样把MyClass这个C++类注册进Lua中的了：&lt;/p&gt;
+
+&lt;p&gt;toLua++生成的桥接代码&lt;/p&gt;
+
+&lt;p&gt;接下来，用g++来编译：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;g++ MyClass.cpp MyLuaModule.cpp main.cpp -llua -ltolua++
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;默认就生成了a.out文件，执行，就能看到main.lua的执行结果了：&lt;/p&gt;
+
+&lt;p&gt;toLua++的执行结果&lt;/p&gt;
+
+&lt;p&gt;至此，对toLua++的运作原理心里就透亮了，无非就是：&lt;/p&gt;
+
+&lt;p&gt;1、把自己该写的类写好&lt;br /&gt;
+2、写个.pkg文件，告诉toLua++这个类暴露出哪些接口给Lua环境 3、再写个桥接的.h和.pkg文件，让toLua++去生成桥接代码&lt;br /&gt;
+4、在程序里使用这个桥接代码，类就注册进Lua环境里了&lt;/p&gt;
+
+&lt;h2 id=&quot;cocos2d-xclua-1&quot;&gt;第五层：使用cocos2d-x的方式来将C++类注册进Lua环境&lt;/h2&gt;
+
+&lt;p&gt;cocos2d-x在2.x版本里就是用toLua++和.pkg文件这么把自己注册进Lua环境里的。不过这种方法明显笨拙，既要写真正做事的.pkg文件，也要写桥接的.pkg文件和.h文件，工作量又大又枯燥。所以从cocos2d-x 3.x开始，用bindings-generator脚本代替了toLua++。&lt;/p&gt;
+
+&lt;p&gt;bindings-generator脚本的工作机制是：&lt;/p&gt;
+
+&lt;p&gt;1、不用挨个类地写桥接.pkg和.h文件了，直接定义一个ini文件，告诉脚本哪些类的哪些方法要暴露出来，注册到Lua环境里的模块名是什么，就行了，等于将原来的每个类乘以3个文件的工作量变成了所有类只需要1个.ini文件&lt;br /&gt;
+2、摸清了toLua++工具的生成方法，改由Python脚本动态分析C++类，自动生成桥接的.h和.cpp代码，不调用tolua++命令了 3、虽然不再调用tolua++命令了，但是底层仍然使用toLua++的库函数，比如tolua_function，bindings-generator脚本生成的代码就跟使用toLua++工具生成的几乎一样&lt;/p&gt;
+
+&lt;p&gt;bindings-generator脚本掌握了生成toLua++桥接代码的主动权，不仅可以省下大量的.pkg和.h文件，而且可以更好地插入自定义代码，达到cocos2d-x环境下的一些特殊目的，比如内存回收之类的。所以cocos2d-x从3.x开始放弃了toLua++和.pkg而改用了自己写的bindings-generator脚本是非常值得赞赏的聪明做法。&lt;/p&gt;
+
+&lt;p&gt;接下来说怎么用bindings-generator脚本：&lt;/p&gt;
+
+&lt;p&gt;1、写自己的C++类，按照cocos2d-x的规矩，继承cocos2d::Ref类，以便使用cocos2d-x的内存回收机制。当然不这么干也行，但是不推荐，不然在Lua环境下对象的释放狠麻烦。&lt;br /&gt;
+2、编写一个.ini文件，让bindings-generator可以根据这个配置文件知道C++类该怎么暴露出来 3、修改bindings-generator脚本，让它去读取这个.ini文件&lt;br /&gt;
+4、执行bindings-generator脚本，生成桥接C++类方法 5、用Xcode将自定义的C++类和生成的桥接文件加入工程，不然编译不到&lt;br /&gt;
+6、修改AppDelegate.cpp，执行桥接方法，自定义的C++类就注册进Lua环境里了&lt;/p&gt;
+
+&lt;p&gt;看着步骤挺多，其实都狠简单。下面一步一步来。&lt;/p&gt;
+
+&lt;p&gt;首先是自定义的C++类。我习惯将文件保存在frameworks/runtime-src/Classes/目录下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;//frameworks/runtime-src/Classes/MyClass.h
+
+#include &quot;cocos2d.h&quot;
+
+using namespace cocos2d;
+
+class MyClass : public Ref
+{
+public:
+  MyClass()   {};
+  ~MyClass()  {};
+  bool init() { return true; };
+  CREATE_FUNC(MyClass);
+
+  int foo(int i);
+};
+frameworks/runtime-src/Classes/MyClass.cpp
+
+#include &quot;MyClass.h&quot;
+
+int MyClass::foo(int i)
+{
+  return i + 100;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后编写.ini文件。在frameworks/cocos2d-x/tools/tolua/目录下能看到genbindings.py脚本和一大堆.ini文件，这些就是bindings-generator的实际执行环境了。随便找一个内容比较少的.ini文件，复制一份，重新命名为MyClass.ini。大部分内容都可以凑合不需要改，这里仅列出必须要改的重要部分：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;frameworks/cocos2d-x/tools/tolua/MyClass.ini
+
+[MyClass]
+prefix           = MyClass
+target_namespace = my
+headers          = %(cocosdir)s/../runtime-src/Classes/MyClass.h
+classes          = MyClass
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也即在MyClass.ini中指定MyClass.h文件的位置，指定要暴露出来的类，指定注册进Lua环境的模块名。&lt;/p&gt;
+
+&lt;p&gt;注意，这个地方我踩了个坑。如果.ini配置文件中存在macro_judgement = …宏定义，要特别小心，我第一次是从cocos2dx_controller.ini文件复制来的，结果没注意macro_judgement，导致生成的桥接类文件加入了不该加入的宏，只在iOS和Android平台上才起作用，对Mac平台无效，这个要特别注意。&lt;/p&gt;
+
+&lt;p&gt;然后修改genbindings.py文件129行附近，将MyClass.ini文件加进去：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;frameworks/cocos2d-x/tools/tolua/genbindings.py
+
+cmd_args = {&#39;cocos2dx.ini&#39; : (&#39;cocos2d-x&#39;, &#39;lua_cocos2dx_auto&#39;), \
+            &#39;MyClass.ini&#39; : (&#39;MyClass&#39;, &#39;lua_MyClass_auto&#39;), \
+            ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;（其实这一步本来是可以省略的，只要让genbindings.py脚本自动搜寻当前目录下的所有ini文件就行了，不知道将来cocos2d-x团队会不会这样优化）&lt;/p&gt;
+
+&lt;p&gt;至此，生成桥接文件的准备工作就做好了，执行genbindings.py脚本：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;python genbindings.py
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;（在Mac系统上可能会遇到缺少yaml、Cheetah包的问题，安装这些Python包狠简单，先sudo easy_install pip，把pip装好，然后用pip各种pip search、sudo pip install就可以了）&lt;/p&gt;
+
+&lt;p&gt;成功执行genbindings.py脚本后，会在frameworks/cocos2d-x/cocos/scripting/lua-bindings/auto/目录下看到新生成的文件：&lt;/p&gt;
+
+&lt;p&gt;成功执行genbindings.py后生成的桥接C++文件&lt;/p&gt;
+
+&lt;p&gt;每次执行genbindings.py脚本时间都挺长的，因为它要重新处理一遍所有的.ini文件，建议大胆修改脚本文件，灵活处理，让它每次只处理需要的.ini文件就可以了，比如像这个样子：&lt;/p&gt;
+
+&lt;p&gt;修改genbindings.py使其只生成自定义的桥接类&lt;/p&gt;
+
+&lt;p&gt;在frameworks/cocos2d-x/cocos/scripting/lua-bindings/auto/目录下观察一下生成的C++桥接文件lua_MyClass_auto.cpp，里面的注册函数名字为register_all_MyClass()，这就是将MyClass类注册进Lua环境的关键函数：&lt;/p&gt;
+
+&lt;p&gt;生成的桥接文件内容&lt;/p&gt;
+
+&lt;p&gt;编辑frameworks/runtime-src/Classes/AppDelegate.cpp文件，首先在文件头加入对lua_MyClass_auto.hpp文件的引用：&lt;/p&gt;
+
+&lt;p&gt;AppDelegate.cpp文件的头加入对lua_MyClass_auto.hpp文件的引用&lt;/p&gt;
+
+&lt;p&gt;然后在正确的代码位置加入对register_all_MyClass函数的调用：&lt;/p&gt;
+
+&lt;p&gt;修改AppDelegate.cpp文件，将MyClass类注册进Lua环境&lt;/p&gt;
+
+&lt;p&gt;最后在执行编译前，将新加入的这几个C++文件都加入到Xcode工程中，使得编译环境知道它们的存在：&lt;/p&gt;
+
+&lt;p&gt;在Xcode中加入新冒出来的C++文件&lt;/p&gt;
+
+&lt;p&gt;这其中还有一个小坑，由于lua_MyClass_auto.cpp文件要引用MyClass.h文件，而这俩文件分属于不同的子项目，互相不认识头文件的搜寻路径，因此需要手工修改一下cocos2d_lua_bindings.xcodeproj子项目的User Header Search Paths配置。特别注意一共有几个../：&lt;/p&gt;
+
+&lt;p&gt;需要修改cocos2d_lua_bindings子项目的User Header Search Paths配置&lt;/p&gt;
+
+&lt;p&gt;最后，就可以用cocos compile -p mac命令重新编译整个项目了，不出意外的话编译一定是成功的。&lt;/p&gt;
+
+&lt;p&gt;修改main.lua文件中，尝试调用一下MyClass类：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local test = my.MyClass:create()
+print(&quot;lua bind: &quot; .. test:foo(99))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后执行程序（用cocos rum -p mac或在Cocos Code IDE中均可），见证奇迹的时刻~~~~咦我擦？！程序崩溃！为毛？&lt;/p&gt;
+
+&lt;p&gt;第一次运行绑定了C++类的程序居然崩溃&lt;/p&gt;
+
+&lt;p&gt;这是我作为cocos2d-x初学者遇到的最大的坑，坑了我整整一天半，具体的研究细节就不详细说了，总之罪魁祸首是cocos2d-x框架中的CCLuaEngine.cpp文件的这段代码：&lt;/p&gt;
+
+&lt;p&gt;CCLuaEngine.cpp执行的这段代码要了命了&lt;/p&gt;
+
+&lt;p&gt;原因是executeScriptFile函数执行时，对当前Lua环境中的栈进行了清理，当register_all_MyClass函数被调用时，Lua栈是全空的状态，函数内部执行到tolua_module函数调用时就崩溃了：&lt;/p&gt;
+
+&lt;p&gt;CCLuaEngine.cpp中对executeScriptFile方法的定义清理了Lua栈&lt;/p&gt;
+
+&lt;p&gt;解决办法是修改AppDelegate.cpp为这个样子：&lt;/p&gt;
+
+&lt;p&gt;AppDelegate.cpp调用register_all_MyClass函数时要重新恢复一下栈的内容才行&lt;/p&gt;
+
+&lt;p&gt;文本形式的代码如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;//AppDelegate.cpp
+
+lua_State *L = stack-&amp;gt;getLuaState();
+lua_getglobal(L, &quot;_G&quot;);
+register_all_MyClass(L);
+lua_settop(L, 0);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;重新编译并执行,程序终于正确执行了&lt;/p&gt;
+
+&lt;p&gt;至此，就彻底搞清楚应该怎样在cocos2d-x项目里绑定一个C函数或者C++类到Lua环境中了，感兴趣的话可以再进一步深入研究Lua内部metatable的运作原理、类对象的生成与释放、以及垃圾回收。我自己也是刚接触cocos2d-x不到一个星期，理解不深，以上难免会有用词不当或理解错误的地方，如有错误请多包涵。&lt;/p&gt;
+
+&lt;p&gt;后记补充：如果C++类定义了namespace，则需要修改frameworks/cocos2d-x/tools/bindings-generator/targets/lua/conversions.yaml文件，定义namespace与Lua之间的映射关系，否则会报conversion wasn’t set错误：&lt;/p&gt;
+
+&lt;p&gt;C++的类如果定义了namespace，则需要在导出Lua时修改conversions.yaml文件&lt;/p&gt;
+</description>
+        <pubDate>Wed, 21 Jan 2015 18:54:00 +0800</pubDate>
+        <link>/2015/01/21/cocos-lua/</link>
+        <guid isPermaLink="true">/2015/01/21/cocos-lua/</guid>
+        
+        
+        <category>cocos</category>
+        
+      </item>
+    
+      <item>
+        <title>Twisted adb模块 api</title>
+        <description>&lt;p&gt;#1. Scheduling tasks for the future&lt;br /&gt;
+&amp;gt; 要在未来X秒的时候运行一个任务，这种方式定义在reactor接口里面&lt;br /&gt;
+``` python&lt;br /&gt;
+twisted.internet.interfaces.IReactorTime:&lt;/p&gt;
+
+&lt;p&gt;from twisted.internet import reactor&lt;br /&gt;
+def f(s):&lt;br /&gt;
+    print “this will run 3.5 seconds after it was scheduled: %s” % s&lt;br /&gt;
+reactor.callLater(3.5, f, “hello, world”)&lt;br /&gt;
+# f() will only be called if the event loop is started.&lt;br /&gt;
+reactor.run()&lt;br /&gt;
+&lt;code&gt;
+&amp;gt; 如果函数结果很重要或者有必要处理函数抛出的异常，那么twisted.internet.task.deferLater功能可以很方便的创建一个Deferred并设置一个延迟调用： 
+&lt;/code&gt; python&lt;br /&gt;
+from twisted.internet import task&lt;br /&gt;
+from twisted.internet import reactor&lt;br /&gt;
+def f(s):&lt;br /&gt;
+  return “This will run 3.5 seconds after it was scheduled: %s” % s&lt;br /&gt;
+d = task.deferLater(reactor, 3.5, f, “hello, world”)&lt;br /&gt;
+def called(result):&lt;br /&gt;
+  print result&lt;br /&gt;
+d.addCallback(called)&lt;br /&gt;
+# f() will only be called if the event loop is started.&lt;br /&gt;
+reactor.run()&lt;br /&gt;
+&lt;code&gt;
+&amp;gt; 如果我们要让一个任务在未来每X秒运行一次，我们可以用twisted.internet.task.LoopingCall: 
+&lt;/code&gt; python&lt;br /&gt;
+from twisted.internet import task&lt;br /&gt;
+from twisted.internet import reactor&lt;br /&gt;
+def runEverySecond():&lt;br /&gt;
+    print “a second has passed”&lt;br /&gt;
+l = task.LoopingCall(runEverySecond)&lt;br /&gt;
+l.start(1.0) # call every second&lt;br /&gt;
+# l.stop() will stop the looping calls&lt;br /&gt;
+reactor.run()&lt;br /&gt;
+&lt;code&gt;
+&amp;gt; 如果我们要取消一个已经在调度(we have scheduled)的任务（应该是指已经加入调度队列的任务）： 
+&lt;/code&gt; python&lt;br /&gt;
+from twisted.internet import reactor&lt;br /&gt;
+def f():&lt;br /&gt;
+    print “I’ll never run.”&lt;br /&gt;
+callID = reactor.callLater(5, f)&lt;br /&gt;
+callID.cancel()&lt;br /&gt;
+reactor.run()&lt;br /&gt;
+```&lt;br /&gt;
+&amp;gt; 就像所有基于reactor的代码(reactor-based code)一样，为了让调度运行必须启动reactor: reactor.run().&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;#2. twisted.enterprise.adbapi: Twisted RDBMS support&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Twsited是一个异步网络框架，但是不幸的是大部分数据库API的实现都是阻塞接口—鉴于这个原因，twisted.enterprise.adbapi横空出世。它是针对标准 DB-API 2.0 API 的非阻塞接口，而且可以访问许多不同的RDBMSes.&lt;br /&gt;
+enterpreise.adbapi会在单独的线程里面执行阻塞的数据库操作，当数据库操作完成的时候又会在原来的线程(originating thread，可能是说twisted的主事件循环线程)中触发回调。在此期间，原来的线程可以继续做正常的工作，比如服务于其他请求。&lt;br /&gt;
+我们并非要直接创建数据库连接，而是用adbapi.ConnectionPool类管理数据库连接。这东东允许enterprise.adbapi使用多个数据库连接，每个线程一个。很简单:&lt;br /&gt;
+&lt;code&gt;python
+# Using the &quot;dbmodule&quot; from the previous example, create a ConnectionPool 
+from twisted.enterprise import adbapi 
+dbpool = adbapi.ConnectionPool(&quot;dbmodule&quot;, &#39;mydb&#39;, &#39;andrew&#39;, &#39;password&#39;)
+&lt;/code&gt;&lt;br /&gt;
+需要注意的是：&lt;br /&gt;
+不需要直接import dbmodule。只用把module的名字传递给adbapi.ConnectionPool的构造函数就行了。&lt;br /&gt;
+需要传递给dbmodule.connect()的参数应当做额外的参数传递给adbapi.ConnectionPool的构造函数。关键字参数也没问题。&lt;br /&gt;
+现在我们来做一个数据库查询：&lt;br /&gt;
+&lt;code&gt;python
+# equivalent of cursor.execute(statement), return cursor.fetchall():
+def getAge(user):
+  return dbpool.runQuery(&quot;SELECT age FROM users WHERE name = ?&quot;, user)
+def printResult(l):
+  if l:
+    print l[0][0], &quot;years old&quot;
+  else:
+    print &quot;No such user&quot;
+&lt;/code&gt;&lt;br /&gt;
+除了getAge的返回值以外，其他都很直观。getAge返回了一个twisted.internet.defer.Deferred,这个Deferred允许在数据库操作完成的时候对于结果或者错误执行任意的callback。&lt;br /&gt;
+除了runQuery,还有runOperation和runInteraction可以被调用。The function will be called in the thread with a twisted.enterprise.adbapi.Transaction, which basically mimics a DB-API cursor. 在所有情况下，一个数据库的事务会在这次数据库使用结束的时候提交，除非抛出了异常（如果抛出了异常就会回滚）。&lt;br /&gt;
+&lt;code&gt;python
+def _getAge(txn, user):
+  # this will run in a thread, we can use blocking calls
+  txn.execute(&quot;SELECT * FROM foo&quot;)
+  # ... other cursor commands called on txn ...
+  txn.execute(&quot;SELECT age FROM users WHERE name = ?&quot;, user)
+  result = txn.fetchall()
+  if result:
+    return result[0][0]
+  else:
+    return None
+def getAge(user):
+  return dbpool.runInteraction(_getAge, user)
+def printResult(age):
+  if age != None:
+    print age, &quot;years old&quot;
+  else:
+    print &quot;No such user&quot;
+getAge(&quot;joe&quot;).addCallback(printResult)
+&lt;/code&gt;&lt;br /&gt;
+这里都假定了dbmodule使用”qmark”风格的参数(parmstyle)(参见DB-API说明书)，这是不碍事的。如果我们的dbmodule要使用一种不同的参数风格(比如pyformat),那么直接用就是了。twisted没有试图提供任何类型的魔法参数转换—runQuery(query,aprams,…)直接映射到cursor.execute(query,params,…).&lt;br /&gt;
+Examples of various database adapters &lt;br /&gt;
+注意，第一个参数是我们要import和使用connect(…)的module的名字，接下来的参数是我们调用connect(…)的参数。&lt;br /&gt;
+&lt;code&gt;python
+from twisted.enterprise import adbapi
+# Gadfly
+cp = adbapi.ConnectionPool(&quot;gadfly&quot;, &quot;test&quot;, &quot;/tmp/gadflyDB&quot;)
+# PostgreSQL PyPgSQL
+cp = adbapi.ConnectionPool(&quot;pyPgSQL.PgSQL&quot;, database=&quot;test&quot;)
+# MySQL
+cp = adbapi.ConnectionPool(&quot;MySQLdb&quot;, db=&quot;test&quot;)
+&lt;/code&gt;&lt;br /&gt;
+===================================================================================================================================================================== &lt;br /&gt;
+#3. Using Threads in Twisted &amp;amp; Running code in a thread-safe manner &lt;br /&gt;
+Twisted中的大部分代码非线程安全。例如，往一个protocol的transport写数据就不是线程安全的。所以，我们需要一种方式来把函数调度到主事件循环里面去运行。这个可用函数twisted.internet.interfaces.IReactorThreads.callFromThread来做到：&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from twisted.internet import reactor
+def notThreadSafe(x):
+   &quot;&quot;&quot;do something that isn&#39;t thread-safe&quot;&quot;&quot;
+   # ...
+def threadSafeScheduler():
+  &quot;&quot;&quot;Run in thread-safe manner.&quot;&quot;&quot;
+  reactor.callFromThread(notThreadSafe, 3) # will run &#39;notThreadSafe(3)&#39;
+                       # in the event loop
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;#4. Running code in threads &lt;br /&gt;
+&amp;gt; 有时我们需要在线程中运行函数–例如，要访问阻塞的API。twisted用IReactorThreads API(twisted.internet.interfaces.IReactorThreads)提供这种方法。其他的功能性函数在twisted.internet.threads中提供。基本上，这些方法可以让我们把函数排进队列里让线程池运行了。&lt;br /&gt;
+例如，要在一个线程中运行一个函数我们可以这样做：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from twisted.internet import reactor
+def aSillyBlockingMethod(x):
+  import time
+  time.sleep(2)
+  print x
+# run method in thread
+reactor.callInThread(aSillyBlockingMethod, &quot;2 seconds have passed&quot;)
+reactor.run()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;功能性函数（utility methods）不是twisted.internet.reactor APIs的一部分，而是在twisted.internet.threads中实现。&lt;br /&gt;
+如果我们有多个函数要在一个线程中序列化运行，我们可以这么做：&lt;br /&gt;
+&lt;code&gt;python
+from twisted.internet import reactor, threads
+def aSillyBlockingMethodOne(x):
+  import time
+  time.sleep(2)
+  print x
+def aSillyBlockingMethodTwo(x):
+  print x
+# run both methods sequentially in a thread
+commands = [(aSillyBlockingMethodOne, [&quot;Calling First&quot;], {})]
+commands.append((aSillyBlockingMethodTwo, [&quot;And the second&quot;], {}))
+threads.callMultipleInThread(commands)
+reactor.run()
+&lt;/code&gt;&lt;br /&gt;
+对于我们需要获取其结果的函数，我们可以让结果作为一个Deferred返回：&lt;br /&gt;
+&lt;code&gt;python
+from twisted.internet import reactor, threads
+def doLongCalculation():
+  # .... do long calculation here ...
+  return 3
+def printResult(x):
+  print x
+# run method in thread and get result as defer.Deferred
+d = threads.deferToThread(doLongCalculation)
+d.addCallback(printResult)
+reactor.run()
+&lt;/code&gt;&lt;br /&gt;
+如果我们要在reactor线程中调用一个函数并获取它的结果，我们可以用blockingCallFromThread:&lt;br /&gt;
+&lt;code&gt;python
+from twisted.internet import threads, reactor, defer
+from twisted.web.client import getPage
+from twisted.web.error import Error
+def inThread():
+  try:
+    result = threads.blockingCallFromThread(
+      reactor, getPage, &quot;http://twistedmatrix.com/&quot;)
+  except Error, exc:
+    print exc
+  else:
+    print result
+  reactor.callFromThread(reactor.stop)
+reactor.callInThread(inThread)
+reactor.run()
+&lt;/code&gt;&lt;br /&gt;
+blockingCallFromThread将把传递给它的函数所返回的对象返回来、或者把传递给它的函数raise的异常raise出来。如果传给它的函数返回一个Deferred,那么它会返回Deferred的callback收到的数据或者raise Deferred的errback收到的异常（ If the function passed to it returns a Deferred, it will return the value the Deferred is called back with or raise the exception it is errbacked with. ）&lt;br /&gt;
+Managing the Thread Pool &lt;br /&gt;
+线程池由twisted.python.threadpool.ThreadPool实现。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;我们可能想修改threadpool的大小，增加或减少使用的线程的数量。我们可以很容易的做到：&lt;/p&gt;
+
+&lt;p&gt;from twisted.internet import reactor&lt;br /&gt;
+reactor.suggestThreadPoolSize(30)&lt;br /&gt;
+线程池的默认大小取决于所使用的reactor；默认的reactor使用的线程池最小线程数为5最大线程数为10.在修改线程池大小之前一定要小心并且要保证已经理解线程以及线程对资源的使用。&lt;br /&gt;
+===================================================================================================================================================================== &lt;br /&gt;
+Deferred Reference &lt;br /&gt;
+Defrereds &lt;br /&gt;
+twisted用Deferred对象管理回调序列。客户程序把一系列的函数附加到deferred上，当异步请求的结果可用时这些函数会被调用,这一系列的函数就是回调(callback)，或者说回调链(callback chain).如果异步请求发生错误也会有一系列的函数被调用，这些函数就是错误回调(errback)或者错误回调链(errback chain)。当结果可用时异步库的代码调用第一个callback，或者当错误发生时调用第一个errback， Deferred对象会把每个callback/errback函数的结果hold住并传入链中的下一个函数 。&lt;/p&gt;
+
+&lt;p&gt;twisted.internet.defer.Deferred对象是函数将会在某个点上产生结果的承诺。我们可以把callback函数附加到给一个Deferred，一旦Deferred得到了结果这些callbacks就会被执行。&lt;/p&gt;
+
+&lt;p&gt;如果不显式的return a twisted.python.failure.Failure或者raise an exception，错误会停止传播 ，正常的callbacks会从这个点上继续执行(详情参见页面上的链路图，一个callback跟一个errback对应，每个callback(errback)的结果传递给下一个callback/errback，同级的errback(callback)没机会执行了)，使用errback返回的结果。如果确实return a twisted.python.failure.Failure或者raise an exception，那么错误会传递给下一个errback.&lt;/p&gt;
+
+&lt;p&gt;如果一个errback不返回任何东西，就等效于返回了一个None对象，那么意味着callbacks会在这errback之后继续执行。callback会用None作为参数，所以要小心！&lt;/p&gt;
+
+&lt;p&gt;twisted.python.failure.Failure实例有一个有用的函数叫trap,可用于作如下等效行为：&lt;/p&gt;
+
+&lt;p&gt;try:&lt;br /&gt;
+    # code that may throw an exception&lt;br /&gt;
+    cookSpamAndEggs()&lt;br /&gt;
+except (SpamException, EggException):&lt;br /&gt;
+    # Handle SpamExceptions and EggExceptions&lt;br /&gt;
+    …&lt;br /&gt;
+等效于&lt;/p&gt;
+
+&lt;p&gt;def errorHandler(failure):&lt;br /&gt;
+    failure.trap(SpamException, EggException)&lt;br /&gt;
+    # Handle SpamExceptions and EggExceptions&lt;br /&gt;
+d.addCallback(cookSpamAndEggs)&lt;br /&gt;
+d.addErrback(errorHandler)&lt;br /&gt;
+如果传递给trap的参数跟Failure中封装的错误不匹配，trap会re-raise那个错误。&lt;/p&gt;
+
+&lt;p&gt;twisted.internet.defer.Deferred.addCallbacks()&lt;/p&gt;
+
+&lt;h1 id=&quot;case-1&quot;&gt;Case 1&lt;/h1&gt;
+&lt;p&gt;d = getDeferredFromSomewhere()&lt;br /&gt;
+d.addCallback(callback1)       # A&lt;br /&gt;
+d.addErrback(errback1)         # B&lt;br /&gt;
+d.addCallback(callback2)       &lt;br /&gt;
+d.addErrback(errback2)        &lt;br /&gt;
+# Case 2&lt;br /&gt;
+d = getDeferredFromSomewhere()&lt;br /&gt;
+d.addCallbacks(callback1, errback1)  # C&lt;br /&gt;
+d.addCallbacks(callback2, errback2)&lt;br /&gt;
+如果callback1中发生错误，Case 1中errback1会被调用来处理Failure；Case 2中errback2会被调用来处理Failure。&lt;/p&gt;
+
+&lt;p&gt;在Case 1中，line A的callback会处理getDeferredFromSomewhere中的成功结果，line B的errback会处理上流代码(the upstream source)中的错误或者A中的错误。&lt;/p&gt;
+
+&lt;p&gt;在Case 2中，line C的errback只处理getDeferredFromSomewhere中抛出的错误，不会处理callback1中抛出的错误。&lt;/p&gt;
+
+&lt;p&gt;对于没有添加errback而发生错误的情况，Deferred被垃圾回收的时候，twisted会把错误的调用栈(traceback)打印到日志文件。所以要小心，如果我们保留了一个对Deferred的引用，从而阻止了它被垃圾回收，那么我们永远都看不到这个错误 （并且会发现我们的callback很神秘的从不被调用）。如果不确定是否有errback忘写，可以显式的在我们callbacks后面追加一个如下所示的errback：&lt;/p&gt;
+
+&lt;p&gt;from twisted.python import log&lt;br /&gt;
+d.addErrback(log.err)&lt;br /&gt;
+Handling either synchronous or asynchronous results &lt;br /&gt;
+有些应用程序中，函数要嘛是异步的(返回一个Deferred,当数据到达时fire这个Deferred)要嘛是同步的(立马返回一个结果)。不过，也有些函数需要同时接受立即结果和Deferreds.&lt;/p&gt;
+
+&lt;p&gt;同步函数：&lt;/p&gt;
+
+&lt;p&gt;def authenticateUser(isValidUser, user):&lt;br /&gt;
+    if isValidUser(user):&lt;br /&gt;
+        print “User is authenticated”&lt;br /&gt;
+    else:&lt;br /&gt;
+        print “User is not authenticated”&lt;br /&gt;
+异步函数：&lt;br /&gt;
+from twisted.internet import reactor, defer&lt;br /&gt;
+def asynchronousIsValidUser(user):&lt;br /&gt;
+    d = defer.Deferred()&lt;br /&gt;
+    reactor.callLater(2, d.callback, user in [“Alice”, “Angus”, “Agnes”])&lt;br /&gt;
+    return d&lt;br /&gt;
+twisted.internet.defer.maybeDeferred()可以保证函数的返回值是一个Deferred，即使函数是一个同步函数：&lt;br /&gt;
+from twisted.internet import defer&lt;br /&gt;
+def printResult(result):&lt;br /&gt;
+  if result:&lt;br /&gt;
+    print “User is authenticated”&lt;br /&gt;
+  else:&lt;br /&gt;
+    print “User is not authenticated”&lt;br /&gt;
+def authenticateUser(isValidUser, user):&lt;br /&gt;
+  d = defer.maybeDeferred(isValidUser, user)&lt;br /&gt;
+  d.addCallback(printResult)&lt;br /&gt;
+isValidUser是synchronousIsValidUser或者asynchronousIsValidUser都行。&lt;/p&gt;
+
+&lt;p&gt;当然，我们也可以修改synchronousIsValidUser使其返回一个Deferred.(https://twistedmatrix.com/documents/current/core/howto/gendefer.html)&lt;/p&gt;
+
+&lt;p&gt;有时候我们需要在几个不同的事件都发生了才被通知，而不是分别等待每个事件。例如，我们可能需要等待一个列表中的连接全部关闭。 twisted.internet.defer.DeferredList就是干这个的。&lt;/p&gt;
+
+&lt;p&gt;根据多个Deferred来创建一个DeferredList，我们只需简单的把一个存储着目标Deferred的list传递进去就行了：&lt;/p&gt;
+
+&lt;p&gt;dl = defer.DeferredList([deferred1,deferred2,deferred3])&lt;br /&gt;
+现在我们可以把DeferredList当成一个普通的Deferred对待；我们可以调用addCallbacks等方法。 DeferredList会在所有Deferreds完成的时候调用它的callback. callback会以DeferredList包含的所有Deferred的结果构成的list作为参数进行执行 ，like so:&lt;/p&gt;
+
+&lt;h1 id=&quot;a-callback-that-unpacks-and-prints-the-results-of-a-deferredlist&quot;&gt;A callback that unpacks and prints the results of a DeferredList&lt;/h1&gt;
+&lt;p&gt;def printResult(result):&lt;br /&gt;
+  for (success, value) in result:&lt;br /&gt;
+    if success:&lt;br /&gt;
+      print ‘Success:’, value&lt;br /&gt;
+    else:&lt;br /&gt;
+      print ‘Failure:’, value.getErrorMessage()&lt;/p&gt;
+
+&lt;h1 id=&quot;create-three-deferreds&quot;&gt;Create three deferreds.&lt;/h1&gt;
+&lt;p&gt;deferred1 = defer.Deferred()&lt;br /&gt;
+deferred2 = defer.Deferred()&lt;br /&gt;
+deferred3 = defer.Deferred()&lt;/p&gt;
+
+&lt;h1 id=&quot;pack-them-into-a-deferredlist&quot;&gt;Pack them into a DeferredList&lt;/h1&gt;
+&lt;p&gt;dl = defer.DeferredList([deferred1, deferred2, deferred3], consumeErrors=True)&lt;/p&gt;
+
+&lt;h1 id=&quot;add-our-callback&quot;&gt;Add our callback&lt;/h1&gt;
+&lt;p&gt;dl.addCallback(printResult)&lt;/p&gt;
+
+&lt;h1 id=&quot;fire-our-three-deferreds-with-various-values&quot;&gt;Fire our three deferreds with various values.&lt;/h1&gt;
+&lt;p&gt;deferred1.callback(‘one’)&lt;br /&gt;
+deferred2.errback(Exception(‘bang!’))&lt;br /&gt;
+deferred3.callback(‘three’)&lt;/p&gt;
+
+&lt;h1 id=&quot;at-this-point-dl-will-fire-its-callback-printing&quot;&gt;At this point, dl will fire its callback, printing:&lt;/h1&gt;
+&lt;p&gt;#	Success: one&lt;br /&gt;
+#	Failure: bang!&lt;br /&gt;
+#	Success: three&lt;br /&gt;
+# (note that defer.SUCCESS == True, and defer.FAILURE == False)&lt;br /&gt;
+标准的DeferredList不会调用errback,但是传给DeferredList的Deferred发生的failure还是会调用errback除非DeferredList的consumeErrors被设成了True(这句话很绕，我理解的意思是，DeferredList只会等待所有Deferred的异步数据到大后才会执行callback,但是不会执行errback；而构成DeferredList的Deferred发生错误时还是可以调用自己的errback；要想阻止Deferred调用自己的errback,需要在构建DeferredList时设置参数consumeError=True.这个理解需要回头用程序验证一下！！)。&lt;br /&gt;
+如果要为构成DeferredList的独立的Deffered提供callback，我们应该对于这些callback添加的时间点很小心。添加一个Deferred到DeferedList的行为实际上内部为Deferred插入了一个callback(当这个callback执行的时候，它检查DeferredList是否已经完成了(我理解的意思是，这个callback检测自己是否是最后一个完成的Deferred，如果是的话就可以调用DefferredList的callback了)).要记住的很重要的事情是，这个内部自动加入的callback它记录的值会是作为result list传入给DefferedList callback函数的东东。&lt;/p&gt;
+
+&lt;p&gt;因此，如果我们在把Deferred加入到DeferredList之后再添加一个callback给Deferred，那么这个callback返回的值将不会传给DeferredList的callback（擦，这么说的话，DeferredList不但要等待它内部所有Deferred的数据到达，而且还要等所有Deferred的callback执行完成，然后把最后的结果合一起作为DeferredList等待的数据）. 为了避免困惑，我们建议不要在Deferred添加到DeferredList之后再为Deferred添加callback.&lt;/p&gt;
+
+&lt;p&gt;def printResult(result):&lt;br /&gt;
+  print result&lt;br /&gt;
+def addTen(result):&lt;br /&gt;
+  return result + “ ten”&lt;/p&gt;
+
+&lt;h1 id=&quot;deferred-gets-callback-before-deferredlist-is-created&quot;&gt;Deferred gets callback before DeferredList is created&lt;/h1&gt;
+&lt;p&gt;deferred1 = defer.Deferred()&lt;br /&gt;
+deferred2 = defer.Deferred()&lt;br /&gt;
+deferred1.addCallback(addTen)&lt;br /&gt;
+dl = defer.DeferredList([deferred1, deferred2])&lt;br /&gt;
+dl.addCallback(printResult)&lt;br /&gt;
+deferred1.callback(“one”) # fires addTen, checks DeferredList, stores “one ten”&lt;br /&gt;
+deferred2.callback(“two”)&lt;br /&gt;
+# At this point, dl will fire its callback, printing:&lt;br /&gt;
+#	 [(1, ‘one ten’), (1, ‘two’)]&lt;/p&gt;
+
+&lt;h1 id=&quot;deferred-gets-callback-after-deferredlist-is-created&quot;&gt;Deferred gets callback after DeferredList is created&lt;/h1&gt;
+&lt;p&gt;deferred1 = defer.Deferred()&lt;br /&gt;
+deferred2 = defer.Deferred()&lt;br /&gt;
+dl = defer.DeferredList([deferred1, deferred2])&lt;br /&gt;
+deferred1.addCallback(addTen) # will run &lt;em&gt;after&lt;/em&gt; DeferredList gets its value&lt;br /&gt;
+dl.addCallback(printResult)&lt;br /&gt;
+deferred1.callback(“one”) # checks DeferredList, stores “one”, fires addTen&lt;br /&gt;
+deferred2.callback(“two”)&lt;br /&gt;
+# At this point, dl will fire its callback, printing:&lt;br /&gt;
+#	 [(1, ‘one), (1, ‘two’)]&lt;br /&gt;
+Other behaviours &lt;br /&gt;
+fireOnOneCallback DeferredList会在有Deferred调用callback时立马调用自己的callback,然后DeferredList不做任何事儿了，忽略其他还没完成的Deferred&lt;/p&gt;
+
+&lt;p&gt;fireOnOneErrback DeferredList会在有Deferred调用errback时立马调用自己的errback,然后DeferredList不做任何事儿了，忽略其他还没完成的Deferred&lt;/p&gt;
+
+&lt;p&gt;consumeErrors 阻止错误在DeferredList包含的任何Deferred的链路上传播（普通创建的DeferredList不会影响结果在它的Deferred的callbacks和errbacks中传递）。用这个选项在DeferedList中停止错误，将阻止“Unhandled error in Deferred”警告出现在DeferredList包含的没必要添加额外errbacks的Deferred中。设置consumeErrors参数为true不会改变fireOnOneCallback或者fireOnOneErrback.&lt;/p&gt;
+
+&lt;p&gt;DeferredList的一个常见应用是join若干平行的异步操作，如果所有操作都成功就成功完成，如果任何一个操作失败就失败。这种情况下，twisted.internet.defer.gatherResults是一个有用的捷径：&lt;/p&gt;
+
+&lt;p&gt;from twisted.internet import defer&lt;br /&gt;
+d1 = defer.Deferred()&lt;br /&gt;
+d2 = defer.Deferred()&lt;br /&gt;
+d = defer.gatherResults([d1, d2], consumeErrors=True)&lt;br /&gt;
+def printResult(result):&lt;br /&gt;
+  print result&lt;br /&gt;
+d.addCallback(printResult)&lt;br /&gt;
+d1.callback(“one”)&lt;br /&gt;
+# nothing is printed yet; d is still awaiting completion of d2&lt;br /&gt;
+d2.callback(“two”)&lt;br /&gt;
+# printResult prints [“one”, “two”]&lt;br /&gt;
+consumeErrors参数跟DeferredList有一样的意义：如果为true,gatherResults会消耗掉传进来的Deferred的所有错误。这个参数都设为true吧，除非我们要为传进来的Deferred添加callbacks或者errbacks,或者除非我们知道他们不会失败。如果不设为true,失败会导致twisted记录一个unhandled error到日志里。这个参数从twisted 11.1.0之后有效。&lt;/p&gt;
+</description>
+        <pubDate>Thu, 15 Jan 2015 21:02:00 +0800</pubDate>
+        <link>/2015/01/15/adbapi/</link>
+        <guid isPermaLink="true">/2015/01/15/adbapi/</guid>
+        
+        
+        <category>server</category>
         
       </item>
     

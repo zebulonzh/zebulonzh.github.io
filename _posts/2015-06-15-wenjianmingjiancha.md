@@ -1,14 +1,17 @@
 ---
-Title: 文件名格式检查(py)
+layout: post
+title: '文件名格式检查'
 date: 2015-06-15 15:39
-tag: Python
-status: public
+categories: Python
+excerpt:
 ---
 
 这个脚本现在用于上个项目中，负责对所有打包文件的命名检查，该脚本的主要特点如下：
+
 * 接受两个命令行参数用于指定搜索路径和日志保存路径，可以方便的嵌入QA的脚本链中。
 * 如果检查出指定目录（及其递归子目录）中有非法文件，会保存在以当前时间命名的log文件中，全部合格则不会产生该文件
 * 代码比较硬，两段注释起来的部分是用来对指定后缀的文件进行检查，之前是这样写的，不过QA说直接检查所有文件就行，于是就雪藏了
+
 ``` python
 # -*-coding: utf-8 -*-
 #param[1]:the absolute path of the root to search

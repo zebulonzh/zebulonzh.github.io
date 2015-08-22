@@ -5,10 +5,10 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>3.x的sqlite在Android读写失败</title>
+	<title>VS 无法查找或加载PDB模块</title>
 	<meta name="description" content="Stories About the Indie Game Developer">
 	
-	<link rel="canonical" href="/2015/04/05/3.x-sqlite-Android/">
+	<link rel="canonical" href="/2015/03/03/VS/">
 	<link rel="alternate" type="application/rss+xml" title="Zebulon" href="/feed.xml" />
 	
 	<!-- <link rel="stylesheet" href="/css/main.css"> -->
@@ -100,49 +100,22 @@
   <div id="myArticle" class="col-sm-9">
     <div class="post-area post">
       <header>
-        <h1>3.x的sqlite在Android读写失败</h1>
-        <p>Apr 5, 2015</p>
+        <h1>VS 无法查找或加载PDB模块</h1>
+        <p>Mar 3, 2015</p>
       </header>
       <hr>
       <article>
-        <ul>
-  <li>
-    <p>问题描述如题，解决方法：直接在软件内读取会失败，需要复制到可写路径内</p>
+        <h3 id="section">解决方案</h3>
 
-    <pre><code>  sqlite3* dbFile = NULL;
+<ol>
+  <li>以VS2012为例，在工具栏中打开底部的选项</li>
+  <li>调试-&gt;常规，勾选“启用源服务器支持”，出现警告，确认。</li>
+  <li>调试-&gt;符号，勾选Microsoft符号服务器，出现警告，确认。</li>
+  <li>F5正常调试</li>
+</ol>
 
-  std::string path;
-
-  path = FileUtils::getInstance()-&gt;fullPathForFilename("db1.db");
-    
-  //安卓平台
-  #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-      path  = FileUtils::getInstance()-&gt;getWritablePath();
-      path  += "/db1.db";
-
-      FILE* file = fopen(path.c_str(), "r");
-      if (file == nullptr)
-      {
-          ssize_t size;
-          const char* data = (char*) FileUtils::getInstance()-&gt;getFileData("db1.db", "rb", &amp;size);
-          file = fopen(path.c_str(), "wb");
-          fwrite(data, size, 1, file);
-          CC_SAFE_DELETE_ARRAY(data);
-      }
-      fclose(file);
-
-  #endif
-
-  CCLOG("数据库路径：%s", path.c_str());
-  int resultOK = sqlite3_open(path.c_str(), &amp;dbFile);
-
-  if (resultOK != SQLITE_OK) {
-      sqlite3_close(dbFile);
-      CCLOG("数据库打开失败: %d", resultOK);
-      return;
-  }
-</code></pre>
-  </li>
+<ul>
+  <li>第一次运行时会出现从Microsoft下载符号的对话框，会比较慢，耐心等下，以后不会每次都下载</li>
 </ul>
 
       </article>
@@ -153,7 +126,7 @@
     <div class="post-area post comment">
       <!-- 多说评论框 start -->
       
-      <div class="ds-thread" data-thread-key="/2015/04/05/3.x-sqlite-Android" data-title="3.x的sqlite在Android读写失败" data-url="gaohaoyang.github.io/2015/04/05/3.x-sqlite-Android/"></div>
+      <div class="ds-thread" data-thread-key="/2015/03/03/VS" data-title="VS 无法查找或加载PDB模块" data-url="gaohaoyang.github.io/2015/03/03/VS/"></div>
       
       <!-- 多说评论框 end -->
     </div>
