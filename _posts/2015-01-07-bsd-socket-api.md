@@ -32,12 +32,12 @@ excerpt:
     * 可以改变一个已经打开的socketFD句柄属性，目前唯一支持的flag是`O_NONBLOCK`，可以把socket变为非阻塞模式
     * command: 等于`F_GETFL`的时候，返回这个sockFD当前的flag，等于`F_SETFL`的时候，将后面传入的flags参数设置为sockFD的flag，error时返回-1比较正统的方法如下
     
-    ``` c++
+<pre><code>
     flags = socket_fcntl(sockfd, F_GETFL,0）;
     flags |= O_NONBLOCK;
     err = socket_fcntl(sockefd, F_SETFL, flags);
     ```
-
+</code></pre>
 
 * ###int socket_getpeername(int sockFD, struct sockaddr *peerAddr, int *addrLength)
     * 获取远程主机的地址，成功返回0，如果没有之前没有连接成功，GetMITLibError()会返回ENOTCONN错误，且返回-1
