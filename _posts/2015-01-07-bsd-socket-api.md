@@ -37,6 +37,7 @@ flags = socket_fcntl(sockfd, F_GETFL,0）；
 flags |= O_NONBLOCK;
 err = socket_fcntl(sockefd, F_SETFL, flags);
 ```
+
 * ###int socket_getpeername(int sockFD, struct sockaddr *peerAddr, int *addrLength)
     * 获取远程主机的地址，成功返回0，如果没有之前没有连接成功，GetMITLibError()会返回ENOTCONN错误，且返回-1
 * ###int socket_getsockname(int sockFD, struct sockaddr *localAddr, int *addrLength)
@@ -73,5 +74,4 @@ err = socket_fcntl(sockefd, F_SETFL, flags);
 * ###int socket_close(int sockFD)
     * 释放掉一个socket的资源，与远程主机断开连接，这是必须要有的，不管tcp还是udp都需要执行这一步，返回0是ok，-1是error
 
-`END`
 `转载请注明出处`
