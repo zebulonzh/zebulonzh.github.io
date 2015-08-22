@@ -1,10 +1,14 @@
 ---
-Title: bsd socket api
-date: 2015-01-07 19:44
-status: public
+layout: post
 title: 'bsd socket api'
+date: 2015-01-07 19:44
+categories: NetWork
+excerpt:
 ---
-[TOC]
+
+* content
+{:toc}
+
 * ###int socket ( int family, int type, int protocol)
     * 创建一个socket，返回一个socket描述符`sockFD`，可以理解为一个句柄,是一个small无符号整数,这个句柄可以使用所有其他的socket操作，返回-1时表示跪了   
     * family: 当前协议族只能是`AF_INET`,因为没有支持IPv6，所以没有AF_INET6
