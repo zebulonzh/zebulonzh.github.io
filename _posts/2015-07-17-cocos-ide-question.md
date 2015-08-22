@@ -2,7 +2,7 @@
 layout: post
 title: 'cocos ide踩坑记录'
 date: 2015-07-17 10:33
-categories: IDE
+categories: IDE Cocos
 excerpt:
 ---
 
