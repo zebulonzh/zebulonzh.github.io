@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>bsd socket api</title>
+	<meta name="description" content="Stories About the Indie Game Developer">
+	
+	<link rel="canonical" href="/2015/01/07/bsd-socket-api/">
+	<link rel="alternate" type="application/rss+xml" title="Zebulon" href="/feed.xml" />
+	
+	<!-- <link rel="stylesheet" href="/css/main.css"> -->
+
+	<link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
+	<!-- <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/fontawesome/4.2.0/css/font-awesome.min.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"> -->
+	
+
+	<link rel="stylesheet" type="text/css" href="/static/css/index.css">
+	
+	<!-- <script type="text/javascript" src="/static/js/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script> -->
+
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" src="/static/js/index.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/highlight.js/8.4/styles/monokai_sublime.min.css">
+	<!-- <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/highlight.js/8.4/styles/railscasts.min.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="http://apps.bdimg.com/libs/highlight.js/8.4/styles/monokai.min.css"> -->
+	<!-- <script type="text/javascript" src="http://apps.bdimg.com/libs/highlight.js/8.4/languages/dos.min.js"></script> -->
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/highlight.js/8.4/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?b636473d6ffa17615f94e5db1459ea81";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+</head>
+
+ <!--  <body data-spy="scroll" data-target="#myAffix"> -->
+  <body>
+
+    <header>
+
+<!-- navbar -->
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <!-- <span class="icon-bar"></span> -->
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Zebulon</a>
+      <p class="navbar-text">Stories About the Indie Game Developer</p>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+
+        
+          <li>
+        
+          <a href="/"><span class="glyphicon glyphicon-th-large"></span> Blog</a></li>
+
+        
+          
+            
+              <li>
+            
+            <a href="/about/"><span class="glyphicon glyphicon-heart"></span> About</a></li>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+</header>
+
+
+    <div id="main" class="container main">
+      <div class="row">
+  <div id="myArticle" class="col-sm-9">
+    <div class="post-area post">
+      <header>
+        <h1>bsd socket api</h1>
+        <p>Jan 7, 2015</p>
+      </header>
+      <hr>
+      <article>
+        <ul id="markdown-toc">
+  <li><a href="#int-socket--int-family-int-type-int-protocol">int socket ( int family, int type, int protocol)</a></li>
+  <li><a href="#int-socketbind--int-sockfd-const-struct-sockaddr-myaddr-int-addrlength">int socket_bind ( int sockFD, const struct sockaddr *myAddr, int addrLength)</a></li>
+  <li><a href="#int-socketconnectint-sockfd-struct-sockaddr-servaddr-int-addrlength">int socket_connect(int sockFD, struct sockaddr *servAddr, int addrLength)</a></li>
+  <li><a href="#int-socketselectint-maxfdsexamined-fdset-readfds-fdset-writefds-fdset-exceptfds-struct-timeval-timeout">int socket_select(int maxFDsExamined, fd_set *readFDs, fd_set *writeFDs, fd_set *exceptFDs, struct timeval *timeOut)</a></li>
+  <li><a href="#socketfcntlint-sockfd-int-command-int-flags">socket_fcntl(int sockFD, int command, int flags)</a></li>
+  <li><a href="#int-socketgetpeernameint-sockfd-struct-sockaddr-peeraddr-int-addrlength">int socket_getpeername(int sockFD, struct sockaddr *peerAddr, int *addrLength)</a></li>
+  <li><a href="#int-socketgetsocknameint-sockfd-struct-sockaddr-localaddr-int-addrlength">int socket_getsockname(int sockFD, struct sockaddr *localAddr, int *addrLength)</a></li>
+  <li><a href="#int-socketreadint-sockfd-void-buffer-uint32-numbytes">int socket_read(int sockFD, void *buffer, UInt32 numBytes)</a></li>
+  <li><a href="#int-socketwriteint-sockfd-void-buffer-uint32-numbytes">int socket_write(int sockFD, void *buffer, UInt32 numBytes)</a></li>
+  <li><a href="#int-socketreadvint-sockfd-struct-iovec-iov-uint32-iovcount">int socket_readv(int sockFD, struct iovec *iov, UInt32 iovCount)</a></li>
+  <li><a href="#int-socketrecvint-sockfd-void-buffer-uint32-numbytes-int-flags">int socket_recv(int sockFD, void *buffer, UInt32 numBytes, int flags)</a></li>
+  <li><a href="#int-socketsendint-sockfd-void-buffer-uint32-numbytes-int-flags">int socket_send(int sockFD, void *buffer, UInt32 numBytes, int flags)</a></li>
+  <li><a href="#int-socketrecvfromint-sockfd-void-buffer-uint32-numbytes-int-flags-struct-sockaddr-fromaddr-socklent-addrlength">int socket_recvfrom(int sockFD, void *buffer, UInt32 numBytes, int flags, struct sockaddr *fromAddr, socklen_t *addrLength)</a></li>
+  <li><a href="#int-socketsendtoint-sockfd-void-buffer-uint32-numbytes-int-flags-struct-sockaddr-toaddr-socklent-addrlength">int socket_sendto(int sockFD, void *buffer, UInt32 numBytes, int flags, struct sockaddr *toAddr, socklen_t addrLength)</a></li>
+  <li><a href="#int-socketshutdownint-sockfd-int-howto">int socket_shutdown(int sockFD, int howTo)</a></li>
+  <li><a href="#int-socketcloseint-sockfd">int socket_close(int sockFD)</a></li>
+</ul>
+
+<ul>
+  <li>
+    <h3 id="int-socket--int-family-int-type-int-protocol">int socket ( int family, int type, int protocol)</h3>
+    <ul>
+      <li>创建一个socket，返回一个socket描述符<code>sockFD</code>，可以理解为一个句柄,是一个small无符号整数,这个句柄可以使用所有其他的socket操作，返回-1时表示跪了   </li>
+      <li>family: 当前协议族只能是<code>AF_INET</code>,因为没有支持IPv6，所以没有AF_INET6</li>
+      <li>type: <code>SOCK_STREAM</code>是tcp流式，<code>SOCK_DGRAM</code>是udp数据包式</li>
+      <li>protocol: <code>PF_INET</code>或者是<code>PF_UNSPEC</code>,两者都可以，前者只能接受v4的协议，后者通吃。</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketbind--int-sockfd-const-struct-sockaddr-myaddr-int-addrlength">int socket_bind ( int sockFD, const struct sockaddr *myAddr, int addrLength)</h3>
+    <ul>
+      <li>绑定一个socket到本地的端口<em>and/or</em>ip地址，不管是ip还是port都可以在库自动选择的情况下得到通配，通配port的话，把address中<code>sin_port</code>域设置0，通配ip的话，把address中的<code>sin_addr.s_addr</code>设置0，和socket()一样，返回-1表示跪了，返回0表示ok</li>
+      <li>tcp有一个端口重用时限机制，如果一个应用试图连续在短时间内第二次绑定同一个本地端口，会出现一个EADDRINUSE错误，等等就好了(这也行。。。)</li>
+      <li>注意第二个参数，本质上是一个<code>struct sockaddr_in*</code>，被转换成了一个更加通用的<code>struct sockaddr*</code>，因为网络地址是被Socket Library所使用（这儿不太懂）</li>
+      <li>不是必须在connect之前使用bind，如果一个socket没有绑定的话，库会选择本地的port和ip</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketconnectint-sockfd-struct-sockaddr-servaddr-int-addrlength">int socket_connect(int sockFD, struct sockaddr *servAddr, int addrLength)</h3>
+    <ul>
+      <li>通过一个给定的port连接远程主机，如果这是一个流式(tcp)socket,会执行一个tcp协商(negotation)来打开一个连接，如果是数据报式(udp)socket，会把地址存储起来，之后会和某些socket操作一起作用，这里比较重要的一点就是，使用udp的情况下，不需要握手，只有根据通信时有没有数据包来判断是否连接成功，所以在通过这个socket进行读写的情况下才会报错。返回-1给跪，0ok</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketselectint-maxfdsexamined-fdset-readfds-fdset-writefds-fdset-exceptfds-struct-timeval-timeout">int socket_select(int maxFDsExamined, fd_set *readFDs, fd_set *writeFDs, fd_set *exceptFDs, struct timeval *timeOut)</h3>
+    <ul>
+      <li>可以轮询一个或多个socket，常用于实现非阻塞socket编程,同样error返回-1（这个函数篇幅有限，详情百度）</li>
+      <li>maxFDsExamined: 描述轮询的句柄范围，要比最大的socket句柄都要大,起兼容作用，windows上无所谓，可以忽略</li>
+      <li>readfds：（可选）指针，指向一组等待可读性检查的套接口。</li>
+      <li>writefds：（可选）指针，指向一组等待可写性检查的套接口。</li>
+      <li>exceptfds：（可选）指针，指向一组等待错误检查的套接口。</li>
+      <li>timeout：select()最多等待时间，对阻塞操作则为NULL，{0,0}表示立即返回，非阻塞。</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="socketfcntlint-sockfd-int-command-int-flags">socket_fcntl(int sockFD, int command, int flags)</h3>
+    <ul>
+      <li>可以改变一个已经打开的socketFD句柄属性，目前唯一支持的flag是<code>O_NONBLOCK</code>，可以把socket变为非阻塞模式</li>
+      <li>
+        <p>command: 等于<code>F_GETFL</code>的时候，返回这个sockFD当前的flag，等于<code>F_SETFL</code>的时候，将后面传入的flags参数设置为sockFD的flag，error时返回-1比较正统的方法如下</p>
+
+        <pre><code>  lags = socket_fcntl(sockfd, F_GETFL,0）;
+  flags |= O_NONBLOCK;
+  err = socket_fcntl(sockefd, F_SETFL, flags);
+</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketgetpeernameint-sockfd-struct-sockaddr-peeraddr-int-addrlength">int socket_getpeername(int sockFD, struct sockaddr *peerAddr, int *addrLength)</h3>
+    <ul>
+      <li>获取远程主机的地址，成功返回0，如果没有之前没有连接成功，GetMITLibError()会返回ENOTCONN错误，且返回-1</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketgetsocknameint-sockfd-struct-sockaddr-localaddr-int-addrlength">int socket_getsockname(int sockFD, struct sockaddr *localAddr, int *addrLength)</h3>
+    <ul>
+      <li>获取该socket的本地port和address，0成功，-1失败</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketreadint-sockfd-void-buffer-uint32-numbytes">int socket_read(int sockFD, void *buffer, UInt32 numBytes)</h3>
+    <ul>
+      <li>从socket中将数据读取到buffer中，numBytes应该是buffer的大小，read函数可能不会装满这个buffer，返回值是所读取数据的大小，失败返回-1，如果返回0，说明socket收到了一个EOF（比如远程主机关闭了）</li>
+      <li>如果在socket上想要完整的执行读取，在读满自己希望的大小之前继续调用read，值得注意的是，如果没有数据可读的时候，read函数会阻塞，这个状态可以通过select查看到。</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketwriteint-sockfd-void-buffer-uint32-numbytes">int socket_write(int sockFD, void *buffer, UInt32 numBytes)</h3>
+    <ul>
+      <li>把numBytes大小的数据从buffer中写入到socket里，同样，write可能也不会把buffer全部写入，返回值是实际写入的大小，失败返回-1</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketreadvint-sockfd-struct-iovec-iov-uint32-iovcount">int socket_readv(int sockFD, struct iovec *iov, UInt32 iovCount)</h3>
+    <ul>
+      <li>等价于read，但是会把数据存放在iov数组的成员里：iov[0],iov[1]…iov[iovCount-1],iovCount的取值范围是(0,IOV_MAX]，把数据分散存放</li>
+      <li>struct iovec的两个成员：<code>caddr_t iov_base</code>和<code>int iov_len</code>，前者是数据存放的首地址，后者是该数据片的长度，readv函数会按顺序填充这些数据片</li>
+      <li>返回值是读取数据的总大小，失败时返回-1,0是EOF</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketrecvint-sockfd-void-buffer-uint32-numbytes-int-flags">int socket_recv(int sockFD, void *buffer, UInt32 numBytes, int flags)</h3>
+    <ul>
+      <li>这个函数和read很像，除了最后一个参数，如果flags被设置为<code>MSG_DONTWAIT</code>，那么当数据不可用的时候这个函数会变成非阻塞。</li>
+      <li>返回值是读取的数据的总数，返回-1时error</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketsendint-sockfd-void-buffer-uint32-numbytes-int-flags">int socket_send(int sockFD, void *buffer, UInt32 numBytes, int flags)</h3>
+    <ul>
+      <li>和write相似，同样如果flags被设置为<code>MSG_DONTWAIT</code>时，此函数会变为非阻塞。</li>
+      <li>返回值是写入的数据的总数，返回-1时error</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketrecvfromint-sockfd-void-buffer-uint32-numbytes-int-flags-struct-sockaddr-fromaddr-socklent-addrlength">int socket_recvfrom(int sockFD, void *buffer, UInt32 numBytes, int flags, struct sockaddr *fromAddr, socklen_t *addrLength)</h3>
+    <ul>
+      <li>从fromAddr指定的远程主机读取信息，要求socket必须为数据报式(udp)，numBytes是buffer的大小，不保证填满buffer，返回值是读取数据的总大小，失败时返回-1</li>
+      <li>如果flags被设置为<code>MSG_DONTWAIT</code>时，此函数会变为非阻塞</li>
+      <li>fromAddr本质上是一个struct sockaddr_in*类型</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketsendtoint-sockfd-void-buffer-uint32-numbytes-int-flags-struct-sockaddr-toaddr-socklent-addrlength">int socket_sendto(int sockFD, void *buffer, UInt32 numBytes, int flags, struct sockaddr *toAddr, socklen_t addrLength)</h3>
+    <ul>
+      <li>向toAddr指定的远程主机发送信息，要求socket必须为数据报式(udp)，numBytes是要发送数据的大小，不保证全部输出buffer，返回值是读取数据的总大小，失败时返回-1</li>
+      <li>如果flags被设置为<code>MSG_DONTWAIT</code>时，此函数会变为非阻塞</li>
+      <li>fromAddr本质上是一个struct sockaddr_in*类型</li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketshutdownint-sockfd-int-howto">int socket_shutdown(int sockFD, int howTo)</h3>
+    <ul>
+      <li>单向或者双向的关闭一个连接着的socket，返回0是ok，-1是error</li>
+      <li>howTo：
+        <ul>
+          <li><code>SHUT_RD</code>关闭正在read的端，这时socket便不再可读</li>
+          <li><code>SHUT_WR</code>关闭正在write的端，这时socket会向远程主机发送一个断开的指令，告诉对方这里已经不会再write任何东西，不再可写</li>
+          <li><code>SHUT_RDWR</code>关闭连接的两端，之后依旧需要使用close来释放掉socket</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <h3 id="int-socketcloseint-sockfd">int socket_close(int sockFD)</h3>
+    <ul>
+      <li>释放掉一个socket的资源，与远程主机断开连接，这是必须要有的，不管tcp还是udp都需要执行这一步，返回0是ok，-1是error</li>
+    </ul>
+  </li>
+</ul>
+
+<p><code>转载请注明出处</code></p>
+
+      </article>
+      <hr>
+      <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a><a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a><a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a></div>
+      <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+    </div>
+    <div class="post-area post comment">
+      <!-- 多说评论框 start -->
+      
+      <div class="ds-thread" data-thread-key="/2015/01/07/bsd-socket-api" data-title="bsd socket api" data-url="gaohaoyang.github.io/2015/01/07/bsd-socket-api/"></div>
+      
+      <!-- 多说评论框 end -->
+    </div>
+  </div>
+
+  <div id="content" class="col-sm-3">
+    <!-- <div id="myAffix" class="shadow-bottom-center hidden-xs" data-spy="affix" data-offset-top="0" data-offset-bottom="-20"> -->
+    <div id="myAffix" class="shadow-bottom-center hidden-xs" >
+      <div class="categories-list-header">
+        Content
+      </div>
+      <div class="content-text"></div>
+    </div>
+  </div>
+</div>
+    </div>
+
+    
+    <div id="top" data-toggle="tooltip" data-placement="left" title="回到顶部">
+      <a href="javascript:;">
+        <div class="arrow"></div>
+        <div class="stick"></div>
+      </a>
+    </div>
+
+    <footer class="">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <a href="mailto:408446482@qq.com"><span class="glyphicon glyphicon-envelope"></span> 408446482@qq.com</a>
+        <span class="point"> · </span>
+        
+          
+          <a href="https://github.com/zebulonzh">
+            <span class="icon">
+              <svg viewBox="0 0 16 16">
+                <path fill="#aaa" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+              </svg>
+            </span>
+            Github
+            <!-- <span>zebulonzh</span> -->
+          </a>
+          
+          
+          <span class="point"> · </span>
+          <span><a href="/feed.xml">RSS</a></span>
+          <span class="point"> · </span>
+          <span>Stories About the Indie Game Developer</span>
+          <span class="point"> · </span>
+          <span>&copy; Designed by <a href="https://github.com/Gaohaoyang">HyG</a></span>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- 在新窗口中打开 -->
+  <script type="text/javascript">
+    function addBlankTargetForLinks () {
+      $('a[href^="http"]').each(function(){
+          $(this).attr('target', '_blank');
+      });
+    }
+    $(document).bind('DOMNodeInserted', function(event) {
+      addBlankTargetForLinks();
+    });
+  </script>
+  </body>
+</html>
