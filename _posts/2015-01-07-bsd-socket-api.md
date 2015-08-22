@@ -38,6 +38,7 @@ flags |= O_NONBLOCK;
 err = socket_fcntl(sockefd, F_SETFL, flags);
 ```
 
+
 * ###int socket_getpeername(int sockFD, struct sockaddr *peerAddr, int *addrLength)
     * 获取远程主机的地址，成功返回0，如果没有之前没有连接成功，GetMITLibError()会返回ENOTCONN错误，且返回-1
 * ###int socket_getsockname(int sockFD, struct sockaddr *localAddr, int *addrLength)
