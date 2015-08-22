@@ -33,9 +33,9 @@ excerpt:
     * command: 等于`F_GETFL`的时候，返回这个sockFD当前的flag，等于`F_SETFL`的时候，将后面传入的flags参数设置为sockFD的flag，error时返回-1比较正统的方法如下
     
 
-    lags = socket_fcntl(sockfd, F_GETFL,0）;
-    flags |= O_NONBLOCK;
-    err = socket_fcntl(sockefd, F_SETFL, flags);
+            lags = socket_fcntl(sockfd, F_GETFL,0）;
+            flags |= O_NONBLOCK;
+            err = socket_fcntl(sockefd, F_SETFL, flags);
 
 
 * ###int socket_getpeername(int sockFD, struct sockaddr *peerAddr, int *addrLength)
