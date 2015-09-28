@@ -45,9 +45,9 @@ remoteip 192.168.0.234-238,192.168.0.245
 ```
 logfile /var/log/pptpd.log
 ```
-	2. 账号配置(/etc/ppp/chap-secrets)
+2. 账号配置(/etc/ppp/chap-secrets)
 
-	每个用户对应一行数据，用户名，服务器，密码和分配ip。用户名和密码都是明文的，服务器默认是pptpd，ip可以指定一个（需要在romoteip范围内），也可以用*代表随机ip。
+每个用户对应一行数据，用户名，服务器，密码和分配ip。用户名和密码都是明文的，服务器默认是pptpd，ip可以指定一个（需要在romoteip范围内），也可以用*代表随机ip。
 	3. Dns配置(/etc/ppp/options)
 
 		把添加可以使用的Dns，比如说：
