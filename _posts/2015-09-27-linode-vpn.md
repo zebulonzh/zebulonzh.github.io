@@ -31,6 +31,7 @@ apt-get install pptpd
 
 ## 2.配置pptp
 1.基本配置(/etc/pptpd.conf)
+
 	/etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
 
 	```
