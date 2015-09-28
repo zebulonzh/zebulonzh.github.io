@@ -1,7 +1,7 @@
 ---
 layout: post
 title: '基于linode搭建vpn'
-date: 2015-01-07 19:44
+date: 2015-09-27 17:51
 categories: NetWork
 excerpt:
 ---
