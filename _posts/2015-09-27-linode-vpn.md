@@ -9,7 +9,7 @@ excerpt:
 * content
 {:toc}
 
-##0.写在前面
+## 0.写在前面
 
 1. 为什么要选择Linode
 
@@ -18,26 +18,26 @@ excerpt:
 2. [怎么购买Linode主机](http://my.oschina.net/denglz/blog/313858)
 
 需要注意的的是
+
 * 只支持信用卡付款；
 * 选站点的时候，建议别选日本（虽然速度真的超快），GFW对于日本的站点封的挺死的。
 
-##1.搭建环境
+## 1.搭建环境
 
 1. 我Rebuilt的是Ubuntu系统，所以根据Linode的说明手册，我们得更新一下apt-get
 
 ```
 apt-get update
 ```
-
 2. 安装pptpd
 
 ```
 apt-get install pptpd
 ```
 
-##2.配置pptp
+## 2.配置pptp
 
-1. 基本配置(/etc/pptpd.conf)
+1.基本配置(/etc/pptpd.conf)
 
 /etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
 
@@ -90,6 +90,7 @@ iptables-save > /etc/iptables-rules
 ```
 
 创建新文件`/etc/network/if-up.d/iptables`,并填充一下内容,这样每次网卡启动时都会重新从iptables-rules读取iptables的转发规则
+
 ```
 #!/bin/sh
 iptables-restore < /etc/iptables-rules
