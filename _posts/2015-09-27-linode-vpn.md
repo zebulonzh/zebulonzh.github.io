@@ -20,6 +20,7 @@ excerpt:
 
 ## 1.搭建环境
 1. 我Rebuilt的是Ubuntu系统，所以根据Linode的说明手册，我们得更新一下apt-get
+
 ```
 apt-get update
 ```
@@ -30,9 +31,8 @@ apt-get install pptpd
 ```
 
 ## 2.配置pptp
-
-	1.基本配置(/etc/pptpd.conf)
-		/etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
+1.基本配置(/etc/pptpd.conf)
+/etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
 
 		```
 		localip 192.168.0.1
@@ -77,7 +77,7 @@ apt-get install pptpd
 		```
 
 		创建新文件`/etc/network/if-up.d/iptables`,并填充一下内容,这样每次网卡启动时都会重新从iptables-rules读取iptables的转发规则
-		
+
 		```
 		#!/bin/sh
 		iptables-restore < /etc/iptables-rules
