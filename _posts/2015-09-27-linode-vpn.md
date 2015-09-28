@@ -10,7 +10,6 @@ excerpt:
 {:toc}
 
 ## 0.写在前面
-
 1. 为什么要选择Linode
 简单看了一下国外的vps的主机，这个牌子比较老，以前的价格也相当高，不过最近几年加量不加价，反而很有竞争力，$10的最低配足够满足个人日常需求了。
 2. [怎么购买Linode主机](http://my.oschina.net/denglz/blog/313858)
@@ -20,7 +19,6 @@ excerpt:
 * 选站点的时候，建议别选日本（虽然速度真的超快），GFW对于日本的站点封的挺死的。
 
 ## 1.搭建环境
-
 1. 我Rebuilt的是Ubuntu系统，所以根据Linode的说明手册，我们得更新一下apt-get
 ```
 apt-get update
@@ -32,7 +30,6 @@ apt-get install pptpd
 ```
 
 ## 2.配置pptp
-
 1.基本配置(/etc/pptpd.conf)
 /etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
 ```
