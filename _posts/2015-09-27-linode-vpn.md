@@ -30,47 +30,56 @@ apt-get install pptpd
 ```
 
 ## 2.配置pptp
-1.基本配置(/etc/pptpd.conf)
 
-	/etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
+	1.基本配置(/etc/pptpd.conf)
+		/etc/pptpd.conf文件是pptp服务器的配置文件，翻滚到文件最下面有localIp和remoteIp两项，remoteip指的是将来分配给VPN Client的IP，localip则是将来VPN Client看到的远端地址。去掉一组注释，设置好remoteip的区间：
 
-	```
-	localip 192.168.0.1
-	remoteip 192.168.0.234-238,192.168.0.245
-	```
+		```
+		localip 192.168.0.1
+		remoteip 192.168.0.234-238,192.168.0.245
+		```
 
-	我们的系统是Ubuntu，所以需要在这个文件中指定log文件的位置，否则就需要在`/etc/pptpd.conf`中注释掉`logwtmp`	以彻底关闭log。
+		我们的系统是Ubuntu，所以需要在这个文件中指定log文件的位置，否则就需要在`/etc/pptpd.conf`中注释掉`logwtmp`	以彻底关闭log。
 
-	```
-	logfile /var/log/pptpd.log
-	```
-	
-2. 账号配置(/etc/ppp/chap-secrets)
-每个用户对应一行数据，用户名，服务器，密码和分配ip。用户名和密码都是明文的，服务器默认是pptpd，ip可以指定一个（需要在romoteip范围内），也可以用*代表随机ip。
-3. Dns配置(/etc/ppp/options)
-把添加可以使用的Dns，比如说：
-```
-ms-dns 8.8.8.8
-ms-dns 8.8.4.4
-```
-4. 开启Ipv4转发(/etc/sysctl.conf)
-编辑/etc/sysctl.conf文件，去掉`net.ipv4.ip_forward=1`前的注释,并执行`sysctl -p`使协议生效
-5. 重启pptp服务
-/etc/init.d/pptpd restart
-6. 安装并开启itables转发
-192.168.0.0/24 对应remoteip的网段
-```
-apt-get install iptables
-iptables -A FORWARD -s 192.168.0.0/24 -j ACCEPT
-iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE
-```
-7. 保存转发规则到`/etc/iptables-rules`
-```
-iptables-save > /etc/iptables-rules
-```
-创建新文件`/etc/network/if-up.d/iptables`,并填充一下内容,这样每次网卡启动时都会重新从iptables-rules读取iptables的转发规则
-```
-#!/bin/sh
-iptables-restore < /etc/iptables-rules
-chmod +x /etc/network/if-up.d/iptables
-```
+		```
+		logfile /var/log/pptpd.log
+		```
+	2. 账号配置(/etc/ppp/chap-secrets)
+
+	每个用户对应一行数据，用户名，服务器，密码和分配ip。用户名和密码都是明文的，服务器默认是pptpd，ip可以指定一个（需要在romoteip范围内），也可以用*代表随机ip。
+	3. Dns配置(/etc/ppp/options)
+
+		把添加可以使用的Dns，比如说：
+		```
+		ms-dns 8.8.8.8
+		ms-dns 8.8.4.4
+		```
+	4. 开启Ipv4转发(/etc/sysctl.conf)
+
+		编辑/etc/sysctl.conf文件，去掉`net.ipv4.ip_forward=1`前的注释,并执行`sysctl -p`使协议生效
+	5. 重启pptp服务
+
+		/etc/init.d/pptpd restart
+
+	6. 安装并开启itables转发
+
+		192.168.0.0/24 对应remoteip的网段
+
+		```
+		apt-get install iptables
+		iptables -A FORWARD -s 192.168.0.0/24 -j ACCEPT
+		iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE
+		```
+	7. 保存转发规则到`/etc/iptables-rules`
+
+		```
+		iptables-save > /etc/iptables-rules
+		```
+
+		创建新文件`/etc/network/if-up.d/iptables`,并填充一下内容,这样每次网卡启动时都会重新从iptables-rules读取iptables的转发规则
+		
+		```
+		#!/bin/sh
+		iptables-restore < /etc/iptables-rules
+		chmod +x /etc/network/if-up.d/iptables
+		```
