@@ -2,7 +2,7 @@
 layout: post
 title: 'bsd socket api'
 date: 2015-01-07 19:44
-categories: NetWork
+categories: Network
 excerpt:
 ---
 

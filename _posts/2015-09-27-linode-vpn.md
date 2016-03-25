@@ -2,7 +2,7 @@
 layout: post
 title: '基于linode搭建vpn'
 date: 2015-09-27 17:51
-categories: NetWork
+categories: Network
 excerpt:
 ---
 
@@ -21,7 +21,7 @@ excerpt:
    
    
    - 选站点的时候，建议别选日本（虽然速度真的超快），GFW对于日本的站点封的挺死的。
-
+œ
 ## 1.搭建环境
 
 1. 我Rebuilt的是Ubuntu系统，所以根据Linode的说明手册，我们得更新一下
